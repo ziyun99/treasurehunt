@@ -21,7 +21,7 @@ export default function Map({ progress, onClickMarker, getUnlockedIndex }) {
           </filter>
         </defs>
         <image
-          href={`${process.env.PUBLIC_URL}/map-bg.svg`}
+          href={`${process.env.PUBLIC_URL}/map.svg`}
           width="800"
           height="600"
         />
