@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { initializeApp } from "firebase/app";
 import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
 import { getFirestore, doc, getDoc, setDoc, collection } from "firebase/firestore";
+import Map from "./Map";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_VITE_FIREBASE_API_KEY,
@@ -13,12 +14,13 @@ const firebaseConfig = {
 };
 
 console.log("🔥 Firebase Config:", firebaseConfig); 
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 const provider = new GoogleAuthProvider();
 
-const START_DATE = new Date("2025-04-20T00:00:00");
+const START_DATE = new Date("2025-04-23T00:00:00");
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -115,30 +117,7 @@ export default function Home() {
         <div className="mt-6">
           <h2 className="text-xl mb-2">我的尋寶圖</h2>
           <p className="text-sm text-gray-600 mb-4">{countdown}</p>
-          <div className="grid grid-cols-4 gap-4">
-            {Array.from({ length: 20 }).map((_, i) => {
-              const unlockedIndex = getUnlockedIndex();
-              if (i > unlockedIndex) {
-                return (
-                  <div
-                    key={i}
-                    className="p-4 rounded-lg border text-center bg-gray-200 text-gray-400 cursor-not-allowed"
-                  >
-                    地標 {i + 1}（未解鎖）
-                  </div>
-                );
-              }
-              return (
-                <button
-                  key={i}
-                  className={`p-4 rounded-lg border text-center ${progress[i] ? "bg-green-300" : "bg-white"}`}
-                  onClick={() => openLandmarkModal(i)}
-                >
-                  地標 {i + 1}
-                </button>
-              );
-            })}
-          </div>
+          <Map progress={progress} onClickMarker={openLandmarkModal} getUnlockedIndex={getUnlockedIndex} />
         </div>
       )}
 
