@@ -62,19 +62,19 @@ export default function DailyChest({ user, diamondPoints, setDiamondPoints, setS
   }, [user]);
 
   const getPosition = () => {
-    const baseX = 200;
-    const baseY = 200;
-    const offset = 100;
+    const baseX = 0.25; // 25% from left
+    const baseY = 0.25; // 25% from top
+    const offset = 50; // Smaller offset for better positioning
 
     if (isPortrait) {
       return {
-        left: `${(baseX / 800) * viewportSize.width}px`,
-        top: `${(baseY / 600) * viewportSize.height - offset}px`
+        left: `${baseX * viewportSize.width}px`,
+        top: `${baseY * viewportSize.height - offset}px`
       };
     } else {
       return {
-        left: `${(baseX / 800) * viewportSize.width - offset}px`,
-        top: `${(baseY / 600) * viewportSize.height}px`
+        left: `${baseX * viewportSize.width - offset}px`,
+        top: `${baseY * viewportSize.height}px`
       };
     }
   };
