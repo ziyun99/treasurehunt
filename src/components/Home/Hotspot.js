@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import AnimatedChest from "./AnimatedChest";
 
 export default function Hotspot({ 
   id, 
@@ -46,15 +47,16 @@ export default function Hotspot({
         className="cursor-pointer group"
         onClick={() => onClickMarker(id)}
       >
-        <image
-          key={`icon-${id}`}
-          href={`${process.env.PUBLIC_URL}/icons/chest-open.svg`}
-          x={-iconOffset}
-          y={-iconOffset}
-          width={iconSize}
-          height={iconSize}
-          className="transition-transform duration-300 ease-out group-hover:scale-110"
-        />
+        <foreignObject x={-iconOffset} y={-iconOffset} width={iconSize} height={iconSize}>
+          <div className="w-full h-full">
+            <AnimatedChest
+              src={`${process.env.PUBLIC_URL}/icons/chest-open.svg`}
+              size={iconSize}
+              onClick={() => onClickMarker(id)}
+              isCheckedIn={true}
+            />
+          </div>
+        </foreignObject>
       </g>
     );
     label = `地標 ${id + 1}（通關成功）`;
@@ -66,15 +68,16 @@ export default function Hotspot({
         className="cursor-pointer group"
         onClick={() => onClickMarker(id)}
       >
-        <image
-          key={`icon-${id}`}
-          href={`${process.env.PUBLIC_URL}/icons/chest-closed.svg`}
-          x={-iconOffset}
-          y={-iconOffset}
-          width={iconSize}
-          height={iconSize}
-          className="transition-transform duration-300 ease-out group-hover:scale-110"
-        />
+        <foreignObject x={-iconOffset} y={-iconOffset} width={iconSize} height={iconSize}>
+          <div className="w-full h-full">
+            <AnimatedChest
+              src={`${process.env.PUBLIC_URL}/icons/chest-closed.svg`}
+              size={iconSize}
+              onClick={() => onClickMarker(id)}
+              isCheckedIn={false}
+            />
+          </div>
+        </foreignObject>
       </g>
     );
     label = `地標 ${id + 1}（未通關）`;
