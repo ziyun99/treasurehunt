@@ -80,7 +80,7 @@ export default function AchievementNotification({ earned, prevEarned }) {
                         />
                       </div>
                       <div className="text-center">
-                        <h3 className="font-bold text-2xl text-gray-800">成就解鎖！</h3>
+                        <h3 className="font-bold text-2xl text-gray-800">獲得徽章！</h3>
                         <p className="text-gray-600 text-xl mt-3">{achievement.label}</p>
                         <p className="text-sm text-gray-500 mt-2">{achievement.description}</p>
                       </div>

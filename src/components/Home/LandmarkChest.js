@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from 'framer-motion';
 import { createPortal } from 'react-dom';
-import AnimatedChest from "./AnimatedChest";
+import BaseChest from "./BaseChest";
 
 const quotes = [
   {
@@ -26,7 +26,7 @@ const quotes = [
   }
 ];
 
-export default function Hotspot({ 
+export default function LandmarkChest({ 
   id, 
   cx, 
   cy, 
@@ -55,76 +55,38 @@ export default function Hotspot({
   const textOffset = 50 * scale;
   const fontSize = 13 * scale;
 
-  const handleChestClick = () => {
-    console.log('Chest clicked:', id, 'Progress:', progress[id]);
-    if (progress[id]) {
-      console.log('Setting showModal to true');
-      setShowModal(true);
+  const getState = () => {
+    if (id > unlockedIndex) {
+      return 'locked';
+    } else if (progress[id]) {
+      return 'completed';
     } else {
-      onClickMarker(id);
+      return 'open';
     }
   };
 
-  let icon, label, status;
-  if (id > unlockedIndex) {
-    icon = (
-      <g transform={`translate(${cx}, ${cy})`}>
-        <image
-          key={`icon-${id}`}
-          href={`${process.env.PUBLIC_URL}/icons/lock.svg`}
-          x={-iconOffset}
-          y={-iconOffset}
-          width={iconSize}
-          height={iconSize}
-          className="cursor-not-allowed"
-        />
-      </g>
-    );
-    label = `地標 ${id + 1}（未解鎖）`;
-    status = "locked";
-  } else if (progress[id]) {
-    icon = (
-      <g 
-        transform={`translate(${cx}, ${cy})`}
-        className="cursor-pointer group"
-        onClick={handleChestClick}
-      >
-        <foreignObject x={-iconOffset} y={-iconOffset} width={iconSize} height={iconSize}>
-          <div className="w-full h-full" onClick={handleChestClick}>
-            <AnimatedChest
-              src={`${process.env.PUBLIC_URL}/icons/chest-open.svg`}
-              size={iconSize}
-              onClick={handleChestClick}
-              isCheckedIn={true}
-            />
-          </div>
-        </foreignObject>
-      </g>
-    );
-    label = `地標 ${id + 1}（通關成功）`;
-    status = "done";
-  } else {
-    icon = (
-      <g 
-        transform={`translate(${cx}, ${cy})`}
-        className="cursor-pointer group"
-        onClick={handleChestClick}
-      >
-        <foreignObject x={-iconOffset} y={-iconOffset} width={iconSize} height={iconSize}>
-          <div className="w-full h-full" onClick={handleChestClick}>
-            <AnimatedChest
-              src={`${process.env.PUBLIC_URL}/icons/chest-closed.svg`}
-              size={iconSize}
-              onClick={handleChestClick}
-              isCheckedIn={false}
-            />
-          </div>
-        </foreignObject>
-      </g>
-    );
-    label = `地標 ${id + 1}（未通關）`;
-    status = "unlocked";
-  }
+  const handleClick = () => {
+    if (progress[id]) return;
+    onClickMarker(id);
+  };
+
+  const getChestIcon = () => {
+    switch (getState()) {
+      case 'locked':
+        return `${process.env.PUBLIC_URL}/icons/lock.svg`;
+      case 'open':
+        return `${process.env.PUBLIC_URL}/icons/chest-closed.svg`;
+      case 'completed':
+        return `${process.env.PUBLIC_URL}/icons/chest-open.svg`;
+      default:
+        return `${process.env.PUBLIC_URL}/icons/chest-closed.svg`;
+    }
+  };
+
+  const getPosition = () => ({
+    left: `${cx - iconOffset}px`,
+    top: `${cy - iconOffset}px`
+  });
 
   console.log('Rendering Hotspot:', id, 'ShowModal:', showModal, 'Progress:', progress[id]);
 
@@ -198,7 +160,31 @@ export default function Hotspot({
   return (
     <>
       <g key={`group-${id}`} className={isVisible ? "opacity-100" : "opacity-0"}>
-        {icon}
+        <g transform={`translate(${cx}, ${cy})`}>
+          {getState() === 'locked' ? (
+            <image
+              href={getChestIcon()}
+              x={-iconOffset}
+              y={-iconOffset}
+              width={iconSize}
+              height={iconSize}
+              className="cursor-not-allowed"
+            />
+          ) : (
+            <foreignObject x={-iconOffset} y={-iconOffset} width={iconSize} height={iconSize}>
+              <div className="w-full h-full" onClick={handleClick}>
+                <BaseChest
+                  id={id}
+                  type="landmark"
+                  state={getState()}
+                  position={{ left: 0, top: 0 }}
+                  size={iconSize}
+                  onClick={handleClick}
+                />
+              </div>
+            </foreignObject>
+          )}
+        </g>
         <text
           x={cx}
           y={cy + textOffset}
@@ -210,7 +196,9 @@ export default function Hotspot({
           filter="url(#textShadow)"
           className="transition-opacity duration-300"
         >
-          {label}
+          {getState() === 'locked' ? `地標 ${id + 1}（未解鎖）` :
+           getState() === 'completed' ? `地標 ${id + 1}（通關成功）` :
+           `地標 ${id + 1}（未通關）`}
         </text>
       </g>
       {modal}

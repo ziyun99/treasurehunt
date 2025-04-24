@@ -7,7 +7,7 @@ const seededRandom = (seed) => {
   return x - Math.floor(x);
 };
 
-export default function HotspotsOverlay({ progress, unlockedIndex, onClickMarker }) {
+export default function LandmarkOverlay({ progress, unlockedIndex, onClickMarker }) {
   const [isVisible, setIsVisible] = useState(false);
   const [viewportSize, setViewportSize] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 800,
@@ -33,17 +33,17 @@ export default function HotspotsOverlay({ progress, unlockedIndex, onClickMarker
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  // Calculate hotspot positions based on viewport size
-  const calculateHotspots = () => {
+  // Calculate landmark positions based on viewport size
+  const calculateLandmarks = () => {
     const { width, height } = viewportSize;
-    const numHotspots = 7;
-    const hotspots = [];
+    const numLandmarks = 7;
+    const landmarks = [];
 
     if (isPortrait) {
       // Portrait layout - fixed random zigzag pattern
       const horizontalMargin = width * 0.15;
       const verticalMargin = height * 0.2;
-      const verticalSpacing = (height - 2 * verticalMargin) / (numHotspots - 1);
+      const verticalSpacing = (height - 2 * verticalMargin) / (numLandmarks - 1);
       const centerX = width / 2;
       const baseAmplitude = (width - 2 * horizontalMargin) / 3;
       
@@ -58,17 +58,17 @@ export default function HotspotsOverlay({ progress, unlockedIndex, onClickMarker
         { amplitude: 1.05, phase: 0.05 }
       ];
 
-      for (let i = 0; i < numHotspots; i++) {
+      for (let i = 0; i < numLandmarks; i++) {
         const y = verticalMargin + (verticalSpacing * i);
         const amplitude = baseAmplitude * variations[i].amplitude;
         const phase = variations[i].phase;
         const x = centerX + amplitude * Math.sin(i * Math.PI / 2 + phase);
-        hotspots.push({ id: i, cx: x, cy: y });
+        landmarks.push({ id: i, cx: x, cy: y });
       }
     } else {
       // Landscape layout - fixed random wave pattern
       const verticalMargin = height * 0.15;
-      const horizontalSpacing = width / (numHotspots + 1);
+      const horizontalSpacing = width / (numLandmarks + 1);
       const centerY = height / 2;
       const baseAmplitude = (height - 2 * verticalMargin) / 3;
       
@@ -83,20 +83,20 @@ export default function HotspotsOverlay({ progress, unlockedIndex, onClickMarker
         { amplitude: 1.05, phase: 0.05, offset: 5 }
       ];
 
-      for (let i = 0; i < numHotspots; i++) {
+      for (let i = 0; i < numLandmarks; i++) {
         const x = horizontalSpacing * (i + 1);
         const amplitude = baseAmplitude * variations[i].amplitude;
         const phase = variations[i].phase;
         const verticalOffset = variations[i].offset;
-        const y = centerY + amplitude * Math.sin((i / (numHotspots - 1)) * Math.PI * 2 + phase) + verticalOffset;
-        hotspots.push({ id: i, cx: x, cy: y });
+        const y = centerY + amplitude * Math.sin((i / (numLandmarks - 1)) * Math.PI * 2 + phase) + verticalOffset;
+        landmarks.push({ id: i, cx: x, cy: y });
       }
     }
 
-    return hotspots;
+    return landmarks;
   };
 
-  const hotspots = calculateHotspots();
+  const landmarks = calculateLandmarks();
 
   // Calculate scale factor based on viewport size
   const baseViewportSize = 800; // Base viewport width for scaling
@@ -119,9 +119,9 @@ export default function HotspotsOverlay({ progress, unlockedIndex, onClickMarker
         </defs>
 
         {/* Draw curved lines connecting all checkpoints */}
-        {hotspots.map((point, idx) => {
+        {landmarks.map((point, idx) => {
           if (idx === 0) return null;
-          const prev = hotspots[idx - 1];
+          const prev = landmarks[idx - 1];
           const cx1 = prev.cx;
           const cy1 = prev.cy;
           const cx2 = point.cx;
@@ -149,8 +149,8 @@ export default function HotspotsOverlay({ progress, unlockedIndex, onClickMarker
           );
         })}
 
-        {/* Render all hotspots */}
-        {hotspots.map(({ id, cx, cy }) => (
+        {/* Render all landmarks */}
+        {landmarks.map(({ id, cx, cy }) => (
           <LandmarkChest
             key={id}
             id={id}

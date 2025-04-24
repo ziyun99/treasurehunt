@@ -8,7 +8,7 @@ import Menubar from "./components/Home/Menubar";
 import Badges from "./components/Home/Badges";
 import LandmarkModal from "./components/Home/LandmarkModal";
 import AchievementNotification from "./components/Home/AchievementNotification";
-import HotspotsOverlay from "./components/Home/HotspotsOverlay";
+import LandmarkOverlay from "./components/Home/LandmarkOverlay";
 import DailyChest from "./components/Home/DailyChest";
 import MusicPlayer from "./components/Home/MusicPlayer";
 import { GAME_RULES } from "./config/gameRules";
@@ -296,7 +296,7 @@ export default function Home() {
 
       {/* Hotspots Overlay */}
       <div className="w-full h-screen absolute inset-0">
-        <HotspotsOverlay
+        <LandmarkOverlay
           progress={progress}
           unlockedIndex={getUnlockedIndex()}
           onClickMarker={handleLandmarkClick}
