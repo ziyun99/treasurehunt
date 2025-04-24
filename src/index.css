@@ -12,6 +12,20 @@
     animation-timing-function: ease-in-out;
   }
 }
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
 .animate-bounce-slow {
   animation: bounce-slow 2.5s infinite;
+}
+
+.animate-shine {
+  animation: shine 1.5s ease-in-out infinite;
 }

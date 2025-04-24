@@ -10,6 +10,7 @@ import LandmarkModal from "./components/Home/LandmarkModal";
 import AchievementNotification from "./components/Home/AchievementNotification";
 import HotspotsOverlay from "./components/Home/HotspotsOverlay";
 import CheckInButton from "./components/Home/CheckInButton";
+import MusicPlayer from "./components/Home/MusicPlayer";
 import { GAME_RULES } from "./config/gameRules";
 import { updateDiamondPoints } from "./utils/pointsManager";
 
@@ -36,6 +37,7 @@ export default function Home() {
   });
   const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth);
   const [diamondPoints, setDiamondPoints] = useState(0);
+  const [isCheckedIn, setIsCheckedIn] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -150,6 +152,24 @@ export default function Home() {
     }, 500);
   };
 
+  const handleCheckIn = async () => {
+    if (user) {
+      setIsCheckedIn(true);
+      await updateDiamondPoints({
+        user,
+        taskId: 'dailyCheckIn',
+        currentPoints: diamondPoints,
+        setDiamondPoints,
+        setShowDiamondBonus,
+        setDiamondBonusType
+      });
+      await setDoc(doc(db, "users", user.uid), { 
+        progress: { dailyCheckIn: true },
+        diamondPoints: diamondPoints + GAME_RULES.tasks.dailyCheckIn.points
+      }, { merge: true });
+    }
+  };
+
   if (!user || !userData?.profileCompleted) return null;
 
   return (
@@ -205,45 +225,54 @@ export default function Home() {
 
       {/* Floating Badges */}
       <div className="fixed bottom-4 left-4 z-20">
-        <div className="md:w-64 w-48">
+        <div className="md:w-80 w-64">
           <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-2 md:p-4">
-            <div className="flex justify-between items-center mb-2">
-              <h2 className="text-sm md:text-lg font-semibold text-gray-800">{userData?.name || '玩家'} 的成就</h2>
+            <div 
+              className="flex justify-between items-center mb-2 cursor-pointer whitespace-nowrap px-3 py-2 hover:bg-gray-50/50 rounded-lg transition-colors duration-200 group"
+              onClick={() => setIsBadgesOpen(!isBadgesOpen)}
+            >
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-indigo-600">💎 {diamondPoints}</span>
-                <button 
-                  onClick={() => setIsBadgesOpen(!isBadgesOpen)}
-                  className="p-1 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                <h2 className="text-sm md:text-lg font-semibold text-gray-800">我的成就</h2>
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className={`h-4 w-4 text-gray-400 transform transition-transform duration-200 ${isBadgesOpen ? 'rotate-180' : ''} group-hover:text-gray-600`} 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
                 >
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    className={`h-4 w-4 text-gray-500 transform transition-transform duration-200 ${isBadgesOpen ? 'rotate-180' : ''}`} 
-                    fill="none" 
-                    viewBox="0 0 24 24" 
-                    stroke="currentColor"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCheckIn();
+                  }}
+                  className={`px-1.5 py-0.5 text-[10px] rounded-full border transition-colors duration-200 whitespace-nowrap ${
+                    isCheckedIn 
+                      ? 'border-green-300 text-green-600 bg-green-50 cursor-not-allowed' 
+                      : 'border-red-500 text-red-500 hover:bg-red-50'
+                  }`}
+                  disabled={isCheckedIn}
+                >
+                  {isCheckedIn ? '已簽到' : '簽到'}
                 </button>
+                <div className="flex items-center gap-1 bg-indigo-50/50 px-2 py-0.5 rounded-full border border-indigo-100 relative overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-100/50 to-transparent animate-shine" style={{ animationDelay: `${Math.random() * 5}s` }} />
+                  <span className="text-sm md:text-lg font-semibold text-indigo-600 relative">{userData?.name || '玩家'}: 💎 {diamondPoints}</span>
+                </div>
               </div>
             </div>
-            <div className={`${isBadgesOpen ? 'block' : 'hidden'}`}>
+            <div className={`transition-all duration-200 ease-in-out ${isBadgesOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
               <Badges progress={progress} />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Check-in Button */}
-      <div className="fixed bottom-4 right-4 z-20">
-        <CheckInButton 
-          user={user} 
-          diamondPoints={diamondPoints}
-          setDiamondPoints={setDiamondPoints}
-          setShowDiamondBonus={setShowDiamondBonus}
-          setDiamondBonusType={setDiamondBonusType}
-        />
-      </div>
+      {/* Music Player */}
+      <MusicPlayer user={user} />
 
       {/* Map Background */}
       <div className="w-full h-screen absolute inset-0 overflow-hidden">
