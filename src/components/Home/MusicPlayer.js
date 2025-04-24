@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 
 export default function MusicPlayer({ user }) {
@@ -27,7 +27,8 @@ export default function MusicPlayer({ user }) {
         const userDoc = await getDoc(userRef);
         if (userDoc.exists()) {
           const data = userDoc.data();
-          const musicEnabled = data?.musicEnabled ?? false;
+          // Default to true if no preference exists
+          const musicEnabled = data?.musicEnabled ?? true;
           setIsPlaying(musicEnabled);
           setVolume(data?.musicVolume ?? 0.5);
           setIsMuted(data?.musicMuted ?? false);
@@ -56,6 +57,16 @@ export default function MusicPlayer({ user }) {
               audioRef.current.pause();
             }
           }
+        } else {
+          // For new users, set default preferences
+          await setDoc(userRef, {
+            musicEnabled: true,
+            musicVolume: 0.5,
+            musicMuted: false
+          });
+          setIsPlaying(true);
+          setVolume(0.5);
+          setIsMuted(false);
         }
       }
     };
