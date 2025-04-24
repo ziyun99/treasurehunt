@@ -61,7 +61,7 @@ export default function MusicPlayer({ user }) {
           // For new users, set default preferences
           await setDoc(userRef, {
             musicEnabled: true,
-            musicVolume: 0.5,
+            musicVolume: 0.3,
             musicMuted: false
           });
           setIsPlaying(true);
