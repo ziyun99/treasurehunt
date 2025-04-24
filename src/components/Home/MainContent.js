@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import Map from "../../Map";
-import Badges from "../../Badges";
+import Map from "./Map";
+import Badges from "./Badges";
 
 const START_DATE = new Date("2025-04-21T00:00:00");
 

@@ -3,7 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { auth, db } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import Header from "./components/Home/Header";
+import Title from "./components/Home/Title";
+import Menubar from "./components/Home/Menubar";
 import MainContent from "./components/Home/MainContent";
 import LandmarkModal from "./components/Home/LandmarkModal";
 
@@ -21,19 +22,21 @@ export default function Home() {
 
   useEffect(() => {
     onAuthStateChanged(auth, async (currentUser) => {
+      if (!currentUser) {
+        navigate('/login');
+        return;
+      }
       setUser(currentUser);
-      if (currentUser) {
-        const ref = doc(db, "users", currentUser.uid);
-        const snap = await getDoc(ref);
-        if (snap.exists()) {
-          const data = snap.data();
-          setUserData(data);
-          setProgress(data.progress || {});
-          if (!data.profileCompleted) navigate("/profile");
-        } else {
-          await setDoc(ref, { progress: {} });
-          navigate("/profile");
-        }
+      const ref = doc(db, "users", currentUser.uid);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        const data = snap.data();
+        setUserData(data);
+        setProgress(data.progress || {});
+        if (!data.profileCompleted) navigate("/profile");
+      } else {
+        await setDoc(ref, { progress: {} });
+        navigate("/profile");
       }
     });
   }, [navigate]);
@@ -72,7 +75,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-yellow-50 p-6">
-      <Header user={user} userData={userData} />
+      <Title countdown={countdown} />
+      <Menubar user={user} />
       <MainContent
         user={user}
         userData={userData}
