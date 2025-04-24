@@ -189,15 +189,6 @@ export default function BaseChest({
           isCheckedIn={state === 'completed'}
           showHoverShadow={showHoverShadow}
         />
-        <div className="mt-2 text-center">
-          <span className={`text-sm font-medium ${
-            state === 'completed' ? 'text-green-600' : 
-            state === 'locked' ? 'text-gray-600' : 
-            'text-blue-600'
-          }`}>
-            {getLabel()}
-          </span>
-        </div>
       </div>
       {modal}
     </div>
