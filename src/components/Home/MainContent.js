@@ -48,7 +48,7 @@ export default function MainContent({ user, userData, progress, onLandmarkClick 
       <div className="bg-white rounded-lg shadow-sm p-6">
         <h2 className="text-2xl font-semibold text-gray-800 mb-4">我的成就</h2>
         <div className="bg-white rounded-lg border border-gray-200 p-4">
-          <Badges />
+          <Badges progress={progress} />
         </div>
       </div>
     </div>
