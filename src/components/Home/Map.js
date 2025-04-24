@@ -1,4 +1,4 @@
-import hotspots from "../../hotspots.json";
+import hotspots from "../../data/hotspots.json";
 
 export default function Map({ progress, onClickMarker, getUnlockedIndex }) {
   const unlockedIndex = getUnlockedIndex();

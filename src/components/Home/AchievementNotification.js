@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import Confetti from "react-confetti";
-import badges from "../../badges.json";
+import badges from "../../data/badges.json";
 
 export default function AchievementNotification({ earned, prevEarned }) {
   const [showNotification, setShowNotification] = useState(false);

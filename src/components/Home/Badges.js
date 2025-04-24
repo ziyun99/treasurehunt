@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import badges from "../../badges.json";
+import badges from "../../data/badges.json";
 import AchievementNotification from "./AchievementNotification";
 
 export default function Badges({ progress }) {
