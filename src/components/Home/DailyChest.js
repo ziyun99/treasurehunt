@@ -81,7 +81,11 @@ export default function DailyChest({ user, diamondPoints, setDiamondPoints, setS
 
   const getChestSize = () => {
     const baseSize = 80;
-    const scale = Math.min(viewportSize.width / 800, viewportSize.height / 600);
+    const baseViewportSize = 800; // Base viewport width for scaling
+    const scale = Math.min(
+      Math.max(viewportSize.width / baseViewportSize, 1), // Minimum scale of 1
+      1.5 // Maximum scale of 1.5
+    );
     return baseSize * scale;
   };
 
