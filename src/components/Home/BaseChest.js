@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { createPortal } from 'react-dom';
 import AnimatedChest from './AnimatedChest';
+import ChestLabel from './ChestLabel';
 
 const quotes = [
   {
@@ -94,21 +95,6 @@ export default function BaseChest({
     }
   };
 
-  const getLabel = () => {
-    if (customLabel) return customLabel;
-    
-    switch (state) {
-      case 'locked':
-        return `地標 ${id + 1}（未解鎖）`;
-      case 'open':
-        return `地標 ${id + 1}（未通關）`;
-      case 'completed':
-        return `地標 ${id + 1}（通關成功）`;
-      default:
-        return '';
-    }
-  };
-
   const modal = showModal ? createPortal(
     <div style={{
       position: 'fixed',
@@ -188,6 +174,12 @@ export default function BaseChest({
           onClick={handleClick}
           isCheckedIn={state === 'completed'}
           showHoverShadow={showHoverShadow}
+        />
+        <ChestLabel
+          id={id}
+          type={type}
+          state={state}
+          customLabel={customLabel}
         />
       </div>
       {modal}
