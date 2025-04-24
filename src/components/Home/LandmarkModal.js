@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import Confetti from "react-confetti";
+import { GAME_RULES } from "../../config/gameRules";
 
 export default function LandmarkModal({ user, activeLandmark, progress, onClose, onProgressUpdate }) {
   const [passwordInput, setPasswordInput] = useState("");
@@ -11,6 +12,7 @@ export default function LandmarkModal({ user, activeLandmark, progress, onClose,
     width: typeof window !== 'undefined' ? window.innerWidth : 0,
     height: typeof window !== 'undefined' ? window.innerHeight : 0,
   });
+  const [isFirstUnlock, setIsFirstUnlock] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -36,6 +38,7 @@ export default function LandmarkModal({ user, activeLandmark, progress, onClose,
 
   const handleClose = () => {
     setIsSuccess(false);
+    setIsFirstUnlock(false);
     onClose();
   };
 
@@ -49,14 +52,30 @@ export default function LandmarkModal({ user, activeLandmark, progress, onClose,
         const newProgress = { ...progress, [activeLandmark]: true };
         onProgressUpdate(newProgress);
         await setDoc(doc(db, "users", user.uid), { progress: newProgress }, { merge: true });
-        setMessage("✅ 通關成功！");
+        
+        // Check if this is the first unlock
+        const firstUnlock = !progress[activeLandmark];
+        setIsFirstUnlock(firstUnlock);
+        
+        const successMessage = firstUnlock 
+          ? GAME_RULES.messages.success.landmarkUnlock(GAME_RULES.points.landmarkUnlock)
+          : "✅ 通關成功！";
+        
+        setMessage(successMessage);
         setIsSuccess(true);
+
+        // If it's a first unlock, delay closing the modal
+        if (firstUnlock) {
+          setTimeout(() => {
+            handleClose();
+          }, 5000); // Show for 3 seconds
+        }
       } else {
-        setMessage("❌ 密語錯誤，請再試一次");
+        setMessage(GAME_RULES.messages.error.wrongPassword);
         setIsSuccess(false);
       }
     } else {
-      setMessage("⚠️ 此地標尚未設置密語");
+      setMessage(GAME_RULES.messages.error.noPassword);
       setIsSuccess(false);
     }
   };

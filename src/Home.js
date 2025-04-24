@@ -24,11 +24,14 @@ export default function Home() {
   const [prevEarned, setPrevEarned] = useState({});
   const [showAchievement, setShowAchievement] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isBadgesOpen, setIsBadgesOpen] = useState(false);
+  const [showDiamondBonus, setShowDiamondBonus] = useState(false);
   const [viewportSize, setViewportSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight
   });
   const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth);
+  const [diamondPoints, setDiamondPoints] = useState(0);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -57,9 +60,10 @@ export default function Home() {
         const data = snap.data();
         setUserData(data);
         setProgress(data.progress || {});
+        setDiamondPoints(data.diamondPoints || 0);
         if (!data.profileCompleted) navigate("/profile");
       } else {
-        await setDoc(ref, { progress: {} });
+        await setDoc(ref, { progress: {}, diamondPoints: 0 });
         navigate("/profile");
       }
     });
@@ -109,8 +113,29 @@ export default function Home() {
     setShowAchievement(false);
   };
 
-  const handleProgressUpdate = (newProgress) => {
+  const handleProgressUpdate = async (newProgress) => {
     setProgress(newProgress);
+    // Calculate if a new landmark was just unlocked
+    const oldCompleted = Object.values(progress || {}).filter(Boolean).length;
+    const newCompleted = Object.values(newProgress || {}).filter(Boolean).length;
+    
+    if (newCompleted > oldCompleted) {
+      // A new landmark was unlocked, increment diamond points
+      const newDiamondPoints = (diamondPoints || 0) + 10;
+      setDiamondPoints(newDiamondPoints);
+      
+      // Show diamond bonus notification
+      setShowDiamondBonus(true);
+      setTimeout(() => setShowDiamondBonus(false), 2000);
+      
+      // Update Firebase
+      if (user) {
+        await setDoc(doc(db, "users", user.uid), { 
+          progress: newProgress,
+          diamondPoints: newDiamondPoints 
+        }, { merge: true });
+      }
+    }
   };
 
   const handleModalClose = () => {
@@ -161,12 +186,43 @@ export default function Home() {
         </div>
       </div>
 
+      {/* Diamond Bonus Notification */}
+      {showDiamondBonus && (
+        <div className="fixed bottom-24 left-4 z-30 animate-bounce">
+          <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-3 flex items-center gap-2">
+            <span className="text-lg">💎</span>
+            <span className="text-lg font-semibold text-indigo-600">+10</span>
+          </div>
+        </div>
+      )}
+
       {/* Floating Badges */}
       <div className="fixed bottom-4 left-4 z-20">
         <div className="md:w-64 w-48">
           <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-2 md:p-4">
-            <h2 className="text-sm md:text-lg font-semibold text-gray-800 mb-1 md:mb-2">我的成就</h2>
-            <Badges progress={progress} />
+            <div className="flex justify-between items-center mb-2">
+              <h2 className="text-sm md:text-lg font-semibold text-gray-800">{userData?.name || '玩家'} 的徽章成就</h2>
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-indigo-600">💎 {diamondPoints}</span>
+                <button 
+                  onClick={() => setIsBadgesOpen(!isBadgesOpen)}
+                  className="md:hidden block p-1 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                >
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    className={`h-4 w-4 text-gray-500 transform transition-transform duration-200 ${isBadgesOpen ? 'rotate-180' : ''}`} 
+                    fill="none" 
+                    viewBox="0 0 24 24" 
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div className={`md:block ${isBadgesOpen ? 'block' : 'hidden'}`}>
+              <Badges progress={progress} />
+            </div>
           </div>
         </div>
       </div>
