@@ -1,0 +1,104 @@
+import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState } from 'react';
+
+const quotes = [
+  {
+    text: "每一次的探索都是心靈的冒險，每一次的發現都是智慧的結晶。",
+    author: "探索者"
+  },
+  {
+    text: "在知識的海洋中，每一滴汗水都是智慧的珍珠。",
+    author: "智者"
+  },
+  {
+    text: "好奇心是探索的鑰匙，堅持是成功的密碼。",
+    author: "冒險家"
+  },
+  {
+    text: "每一個密碼背後，都藏著一個等待被發現的故事。",
+    author: "解謎者"
+  },
+  {
+    text: "智慧不在於知道多少，而在於如何運用所學。",
+    author: "導師"
+  }
+];
+
+export default function MotivationQuoteModal({ isOpen, onClose }) {
+  const [currentQuote, setCurrentQuote] = useState(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      const randomIndex = Math.floor(Math.random() * quotes.length);
+      setCurrentQuote(quotes[randomIndex]);
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      zIndex: 9999,
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      backdropFilter: 'blur(4px)'
+    }}>
+      <div style={{
+        position: 'relative',
+        width: '90%',
+        maxWidth: '500px',
+        padding: '2rem',
+        borderRadius: '1rem',
+        background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))',
+        color: 'white',
+        boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ fontSize: '2.5rem', marginBottom: '1.5rem' }}>✨</div>
+          {currentQuote && (
+            <>
+              <p style={{ 
+                marginBottom: '1.5rem', 
+                fontSize: '1.25rem', 
+                fontWeight: 500,
+                lineHeight: 1.6
+              }}>
+                "{currentQuote.text}"
+              </p>
+              <p style={{ 
+                fontSize: '0.875rem', 
+                color: 'rgba(255, 255, 255, 0.8)'
+              }}>
+                — {currentQuote.author}
+              </p>
+            </>
+          )}
+        </div>
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '1rem',
+            right: '1rem',
+            padding: '0.5rem',
+            color: 'rgba(255, 255, 255, 0.7)',
+            transition: 'color 0.2s'
+          }}
+          onMouseOver={e => e.currentTarget.style.color = 'white'}
+          onMouseOut={e => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+} 
