@@ -121,19 +121,6 @@ export default function Map({ progress, onClickMarker, getUnlockedIndex }) {
           return (
             <g key={`group-${id}`}>
               {icon}
-              <text
-                x={cx}
-                y={cy + 50}
-                textAnchor="middle"
-                fontSize="13"
-                fontWeight="500"
-                fontFamily="Segoe UI, sans-serif"
-                fill="#fff"
-                filter="url(#textShadow)"
-                className="transition-opacity duration-300"
-              >
-                {label}
-              </text>
             </g>
           );
         })}
