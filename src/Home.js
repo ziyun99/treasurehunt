@@ -213,7 +213,7 @@ export default function Home() {
                 <span className="text-sm font-medium text-indigo-600">💎 {diamondPoints}</span>
                 <button 
                   onClick={() => setIsBadgesOpen(!isBadgesOpen)}
-                  className="md:hidden block p-1 rounded-full hover:bg-gray-100 transition-colors duration-200"
+                  className="p-1 rounded-full hover:bg-gray-100 transition-colors duration-200"
                 >
                   <svg 
                     xmlns="http://www.w3.org/2000/svg" 
@@ -227,7 +227,7 @@ export default function Home() {
                 </button>
               </div>
             </div>
-            <div className={`md:block ${isBadgesOpen ? 'block' : 'hidden'}`}>
+            <div className={`${isBadgesOpen ? 'block' : 'hidden'}`}>
               <Badges progress={progress} />
             </div>
           </div>
