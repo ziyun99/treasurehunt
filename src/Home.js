@@ -5,10 +5,10 @@ import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import Title from "./components/Home/Title";
 import Menubar from "./components/Home/Menubar";
-import Map from "./components/Home/Map";
 import Badges from "./components/Home/Badges";
 import LandmarkModal from "./components/Home/LandmarkModal";
 import AchievementNotification from "./components/Home/AchievementNotification";
+import HotspotsOverlay from "./components/Home/HotspotsOverlay";
 
 const START_DATE = new Date("2025-04-22T00:00:00");
 
@@ -23,7 +23,17 @@ export default function Home() {
   const [earned, setEarned] = useState({});
   const [prevEarned, setPrevEarned] = useState({});
   const [showAchievement, setShowAchievement] = useState(false);
+  const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsPortrait(window.innerHeight > window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     onAuthStateChanged(auth, async (currentUser) => {
@@ -106,7 +116,7 @@ export default function Home() {
   if (!user || !userData?.profileCompleted) return null;
 
   return (
-    <div className="min-h-screen bg-yellow-50 relative">
+    <div className="min-h-screen bg-yellow-50 relative overflow-hidden">
       {/* Floating Title */}
       <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-20">
         <Title countdown={countdown} />
@@ -125,9 +135,37 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Map as background */}
-      <div className="w-full h-screen">
-        <Map progress={progress} onClickMarker={handleLandmarkClick} getUnlockedIndex={getUnlockedIndex} />
+      {/* Map Background */}
+      <div className="w-full h-screen absolute inset-0">
+        <svg 
+          className={`w-full h-full ${isPortrait ? 'rotate-90' : ''}`}
+          style={{
+            transformOrigin: 'center center',
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0
+          }}
+        >
+          <image
+            href={`${process.env.PUBLIC_URL}/map.svg`}
+            x="0"
+            y="0"
+            width="100%"
+            height="100%"
+            preserveAspectRatio="none"
+          />
+        </svg>
+      </div>
+
+      {/* Hotspots Overlay */}
+      <div className="w-full h-screen absolute inset-0">
+        <HotspotsOverlay
+          progress={progress}
+          unlockedIndex={getUnlockedIndex()}
+          onClickMarker={handleLandmarkClick}
+        />
       </div>
 
       <LandmarkModal
