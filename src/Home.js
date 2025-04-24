@@ -5,8 +5,10 @@ import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import Title from "./components/Home/Title";
 import Menubar from "./components/Home/Menubar";
-import MainContent from "./components/Home/MainContent";
+import Map from "./components/Home/Map";
+import Badges from "./components/Home/Badges";
 import LandmarkModal from "./components/Home/LandmarkModal";
+import AchievementNotification from "./components/Home/AchievementNotification";
 
 const START_DATE = new Date("2025-04-23T00:00:00");
 
@@ -18,6 +20,8 @@ export default function Home() {
   const [passwordInput, setPasswordInput] = useState("");
   const [message, setMessage] = useState("");
   const [countdown, setCountdown] = useState("");
+  const [earned, setEarned] = useState({});
+  const [prevEarned, setPrevEarned] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -65,6 +69,17 @@ export default function Home() {
     return diff;
   };
 
+  useEffect(() => {
+    const totalCompleted = Object.values(progress || {}).filter(Boolean).length;
+    const newEarned = {
+      firstStep: progress?.[0],
+      halfWay: totalCompleted >= 3,
+      completed: totalCompleted === 7
+    };
+    setPrevEarned(earned);
+    setEarned(newEarned);
+  }, [progress]);
+
   const handleLandmarkClick = (id) => {
     setActiveLandmark(id);
   };
@@ -73,16 +88,33 @@ export default function Home() {
     setProgress(newProgress);
   };
 
+  if (!user || !userData?.profileCompleted) return null;
+
   return (
-    <div className="min-h-screen bg-yellow-50 p-6">
-      <Title countdown={countdown} />
-      <Menubar user={user} />
-      <MainContent
-        user={user}
-        userData={userData}
-        progress={progress}
-        onLandmarkClick={handleLandmarkClick}
-      />
+    <div className="min-h-screen bg-yellow-50 relative">
+      {/* Floating Title */}
+      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-20">
+        <Title countdown={countdown} />
+      </div>
+
+      {/* Floating Menubar */}
+      <div className="fixed top-4 right-4 z-20">
+        <Menubar user={user} />
+      </div>
+
+      {/* Floating Badges */}
+      <div className="fixed bottom-4 left-4 z-20 w-64">
+        <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-4">
+          <h2 className="text-lg font-semibold text-gray-800 mb-2">我的成就</h2>
+          <Badges progress={progress} />
+        </div>
+      </div>
+
+      {/* Map as background */}
+      <div className="w-full h-screen">
+        <Map progress={progress} onClickMarker={handleLandmarkClick} getUnlockedIndex={getUnlockedIndex} />
+      </div>
+
       <LandmarkModal
         user={user}
         activeLandmark={activeLandmark}
@@ -90,6 +122,7 @@ export default function Home() {
         onClose={() => setActiveLandmark(null)}
         onProgressUpdate={handleProgressUpdate}
       />
+      <AchievementNotification earned={earned} prevEarned={prevEarned} />
     </div>
   );
 }

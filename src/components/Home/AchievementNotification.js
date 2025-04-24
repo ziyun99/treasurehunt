@@ -54,40 +54,43 @@ export default function AchievementNotification({ earned, prevEarned }) {
   return (
     <>
       {showNotification && (
-        <Confetti
-          width={windowSize.width}
-          height={windowSize.height}
-          recycle={false}
-          numberOfPieces={200}
-          gravity={0.3}
-        />
-      )}
-      <AnimatePresence>
-        {showNotification && achievement && (
-          <motion.div
-            initial={{ y: -100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            exit={{ y: -100, opacity: 0 }}
-            transition={{ type: "spring", damping: 25, stiffness: 120 }}
-            className="fixed top-4 right-4 z-50"
-          >
-            <div className="bg-white rounded-lg shadow-lg p-4 border-l-4 border-yellow-500">
-              <div className="flex items-center gap-3">
-                <img
-                  src={`/icons/${achievement.icon}`}
-                  alt={achievement.label}
-                  className="w-12 h-12"
-                />
-                <div>
-                  <h3 className="font-bold text-lg text-gray-800">成就解鎖！</h3>
-                  <p className="text-gray-600">{achievement.label}</p>
-                  <p className="text-sm text-gray-500">{achievement.description}</p>
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center">
+          <Confetti
+            width={windowSize.width}
+            height={windowSize.height}
+            recycle={false}
+            numberOfPieces={200}
+            gravity={0.3}
+            style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%' }}
+          />
+          <AnimatePresence>
+            {achievement && (
+              <motion.div
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.8, opacity: 0 }}
+                transition={{ type: "spring", damping: 20, stiffness: 300 }}
+                className="relative z-[10000]"
+              >
+                <div className="bg-white rounded-lg shadow-lg p-8 border-l-4 border-yellow-500 min-w-[320px] max-w-[90vw]">
+                  <div className="flex flex-col items-center gap-4">
+                    <img
+                      src={`/icons/${achievement.icon}`}
+                      alt={achievement.label}
+                      className="w-20 h-20"
+                    />
+                    <div className="text-center">
+                      <h3 className="font-bold text-2xl text-gray-800">成就解鎖！</h3>
+                      <p className="text-gray-600 text-xl mt-3">{achievement.label}</p>
+                      <p className="text-sm text-gray-500 mt-2">{achievement.description}</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
     </>
   );
 } 
