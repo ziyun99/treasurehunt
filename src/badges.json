@@ -1,0 +1,6 @@
+[
+    { "id": "firstStep", "label": "初始之星", "icon": "star.svg" },
+    { "id": "halfWay", "label": "勇者之路", "icon": "medal.svg" },
+    { "id": "completed", "label": "終極寶藏", "icon": "crown.svg" }
+]
+  

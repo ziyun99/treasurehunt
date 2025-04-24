@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { initializeApp } from "firebase/app";
-import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
-import { getFirestore, doc, getDoc, setDoc, collection } from "firebase/firestore";
+import { auth, db, provider } from "./firebase";
+import { onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import Map from "./Map";
+import Badges from "./Badges";
 
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_VITE_FIREBASE_API_KEY,
@@ -13,12 +14,6 @@ const firebaseConfig = {
   appId: process.env.REACT_APP_VITE_FIREBASE_APP_ID
 };
 
-console.log("🔥 Firebase Config:", firebaseConfig); 
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-const provider = new GoogleAuthProvider();
 
 const START_DATE = new Date("2025-04-23T00:00:00");
 
@@ -118,6 +113,9 @@ export default function Home() {
           <h2 className="text-xl mb-2">我的尋寶圖</h2>
           <p className="text-sm text-gray-600 mb-4">{countdown}</p>
           <Map progress={progress} onClickMarker={openLandmarkModal} getUnlockedIndex={getUnlockedIndex} />
+          <div className="mt-10">
+            <Badges />
+          </div>
         </div>
       )}
 
@@ -142,3 +140,4 @@ export default function Home() {
     </div>
   );
 }
+
