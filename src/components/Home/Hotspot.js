@@ -4,6 +4,7 @@ export default function Hotspot({
   id, 
   cx, 
   cy, 
+  scale = 1,
   progress, 
   unlockedIndex, 
   onClickMarker 
@@ -15,6 +16,12 @@ export default function Hotspot({
     setIsVisible(true);
   }, []);
 
+  // Calculate scaled dimensions
+  const iconSize = 80 * scale;
+  const iconOffset = iconSize / 2;
+  const textOffset = 50 * scale;
+  const fontSize = 13 * scale;
+
   let icon, label, status;
   if (id > unlockedIndex) {
     icon = (
@@ -22,10 +29,10 @@ export default function Hotspot({
         <image
           key={`icon-${id}`}
           href={`${process.env.PUBLIC_URL}/icons/lock.svg`}
-          x="-35"
-          y="-35"
-          width="70"
-          height="70"
+          x={-iconOffset}
+          y={-iconOffset}
+          width={iconSize}
+          height={iconSize}
           className="cursor-not-allowed"
         />
       </g>
@@ -42,10 +49,10 @@ export default function Hotspot({
         <image
           key={`icon-${id}`}
           href={`${process.env.PUBLIC_URL}/icons/chest-open.svg`}
-          x="-40"
-          y="-40"
-          width="80"
-          height="80"
+          x={-iconOffset}
+          y={-iconOffset}
+          width={iconSize}
+          height={iconSize}
           className="transition-transform duration-300 ease-out group-hover:scale-110"
         />
       </g>
@@ -62,10 +69,10 @@ export default function Hotspot({
         <image
           key={`icon-${id}`}
           href={`${process.env.PUBLIC_URL}/icons/chest-closed.svg`}
-          x="-40"
-          y="-40"
-          width="80"
-          height="80"
+          x={-iconOffset}
+          y={-iconOffset}
+          width={iconSize}
+          height={iconSize}
           className="transition-transform duration-300 ease-out group-hover:scale-110"
         />
       </g>
@@ -79,9 +86,9 @@ export default function Hotspot({
       {icon}
       <text
         x={cx}
-        y={cy + 50}
+        y={cy + textOffset}
         textAnchor="middle"
-        fontSize="13"
+        fontSize={fontSize}
         fontWeight="500"
         fontFamily="Segoe UI, sans-serif"
         fill="#fff"
