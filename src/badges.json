@@ -1,6 +1,6 @@
 [
-    { "id": "firstStep", "label": "初始之星", "icon": "star.svg" },
-    { "id": "halfWay", "label": "勇者之路", "icon": "medal.svg" },
-    { "id": "completed", "label": "終極寶藏", "icon": "crown.svg" }
+    { "id": "firstStep", "label": "初始之星", "description": "完成地標 1", "icon": "star.svg" },
+    { "id": "halfWay", "label": "勇者之路", "description": "完成至地標 3", "icon": "medal.svg" },
+    { "id": "completed", "label": "終極寶藏", "description": "完成至地標 7", "icon": "crown.svg" }
 ]
   

@@ -1,18 +1,43 @@
 import { useState, useEffect } from "react";
 import { doc, getDoc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase";
+import Confetti from "react-confetti";
 
 export default function LandmarkModal({ user, activeLandmark, progress, onClose, onProgressUpdate }) {
   const [passwordInput, setPasswordInput] = useState("");
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
+  const [windowSize, setWindowSize] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 0,
+    height: typeof window !== 'undefined' ? window.innerHeight : 0,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   // Reset input and message when landmark changes
   useEffect(() => {
     setPasswordInput("");
     setMessage("");
-    setIsSuccess(false);
+    // Only reset isSuccess if we're not in a success state
+    if (!isSuccess) {
+      setIsSuccess(false);
+    }
   }, [activeLandmark]);
+
+  const handleClose = () => {
+    setIsSuccess(false);
+    onClose();
+  };
 
   const checkPassword = async () => {
     if (!user || activeLandmark == null) return;
@@ -40,6 +65,16 @@ export default function LandmarkModal({ user, activeLandmark, progress, onClose,
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      {isSuccess && (
+        <Confetti
+          width={windowSize.width}
+          height={windowSize.height}
+          recycle={false}
+          numberOfPieces={200}
+          gravity={0.3}
+          style={{ position: 'fixed', top: 0, left: 0 }}
+        />
+      )}
       <div className="bg-white rounded-xl shadow-lg w-full max-w-md mx-4">
         <div className="p-6">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">地標 {activeLandmark + 1} 通關密語</h2>
@@ -65,14 +100,14 @@ export default function LandmarkModal({ user, activeLandmark, progress, onClose,
             <div className="flex justify-end gap-3">
               {!isSuccess && (
                 <button 
-                  onClick={() => onClose()} 
+                  onClick={handleClose} 
                   className="px-4 py-2 text-gray-600 hover:text-gray-800"
                 >
                   取消
                 </button>
               )}
               <button 
-                onClick={isSuccess ? onClose : checkPassword} 
+                onClick={isSuccess ? handleClose : checkPassword} 
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
               >
                 {isSuccess ? "關閉" : "確認"}
