@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase';
 import { signOut } from 'firebase/auth';
 
-export default function Menubar({ user }) {
+export default function Menubar({ user, isVertical = false }) {
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -22,16 +22,16 @@ export default function Menubar({ user }) {
   if (!user) return null;
 
   return (
-    <div className="flex justify-end mb-4">
+    <div className={`${isVertical ? 'flex flex-col space-y-2' : 'flex justify-end space-x-4'}`}>
       <button
         onClick={handleEditProfile}
-        className="bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded mr-4"
+        className={`${isVertical ? 'w-full' : ''} bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200`}
       >
         編輯個人資料
       </button>
       <button
         onClick={handleLogout}
-        className="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+        className={`${isVertical ? 'w-full' : ''} bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200`}
       >
         登出
       </button>

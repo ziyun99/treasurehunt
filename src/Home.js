@@ -23,11 +23,20 @@ export default function Home() {
   const [earned, setEarned] = useState({});
   const [prevEarned, setPrevEarned] = useState({});
   const [showAchievement, setShowAchievement] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [viewportSize, setViewportSize] = useState({
+    width: window.innerWidth,
+    height: window.innerHeight
+  });
   const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth);
   const navigate = useNavigate();
 
   useEffect(() => {
     const handleResize = () => {
+      setViewportSize({
+        width: window.innerWidth,
+        height: window.innerHeight
+      });
       setIsPortrait(window.innerHeight > window.innerWidth);
     };
 
@@ -88,7 +97,6 @@ export default function Home() {
       completed: totalCompleted === 7
     };
     
-    // Only show achievement if modal is not active
     if (!activeLandmark) {
       setPrevEarned(earned);
       setEarned(newEarned);
@@ -107,7 +115,6 @@ export default function Home() {
 
   const handleModalClose = () => {
     setActiveLandmark(null);
-    // Show achievement after a short delay when modal closes
     setTimeout(() => {
       setShowAchievement(true);
     }, 500);
@@ -118,29 +125,59 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-yellow-50 relative overflow-hidden">
       {/* Floating Title */}
-      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-20">
+      <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-md px-4">
         <Title countdown={countdown} />
       </div>
 
       {/* Floating Menubar */}
       <div className="fixed top-4 right-4 z-20">
-        <Menubar user={user} />
+        <div className="md:block hidden">
+          <Menubar user={user} />
+        </div>
+        <div className="md:hidden block">
+          <button 
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="p-2 rounded-lg bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white transition-colors duration-200"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          {isMenuOpen && (
+            <>
+              {/* Backdrop */}
+              <div 
+                className="fixed inset-0 bg-black/20 z-20"
+                onClick={() => setIsMenuOpen(false)}
+              />
+              {/* Menu Dropdown */}
+              <div className="absolute right-0 mt-2 w-56 rounded-lg bg-white/95 shadow-xl transform transition-all duration-200 ease-in-out z-30">
+                <div className="p-3">
+                  <Menubar user={user} isVertical={true} />
+                </div>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
       {/* Floating Badges */}
-      <div className="fixed bottom-4 left-4 z-20 w-64">
-        <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-4">
-          <h2 className="text-lg font-semibold text-gray-800 mb-2">我的成就</h2>
-          <Badges progress={progress} />
+      <div className="fixed bottom-4 left-4 z-20">
+        <div className="md:w-64 w-48">
+          <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-2 md:p-4">
+            <h2 className="text-sm md:text-lg font-semibold text-gray-800 mb-1 md:mb-2">我的成就</h2>
+            <Badges progress={progress} />
+          </div>
         </div>
       </div>
 
       {/* Map Background */}
-      <div className="w-full h-screen absolute inset-0">
+      <div className="w-full h-screen absolute inset-0 overflow-hidden">
         <svg 
-          className={`w-full h-full ${isPortrait ? 'rotate-90' : ''}`}
+          className="w-full h-full"
+          viewBox={`0 0 ${viewportSize.width} ${viewportSize.height}`}
+          preserveAspectRatio="none"
           style={{
-            transformOrigin: 'center center',
             position: 'absolute',
             top: 0,
             left: 0,
@@ -149,11 +186,11 @@ export default function Home() {
           }}
         >
           <image
-            href={`${process.env.PUBLIC_URL}/map.svg`}
+            href={`${process.env.PUBLIC_URL}/${isPortrait ? 'map-vertical.svg' : 'map.svg'}`}
             x="0"
             y="0"
-            width="100%"
-            height="100%"
+            width={viewportSize.width}
+            height={viewportSize.height}
             preserveAspectRatio="none"
           />
         </svg>
