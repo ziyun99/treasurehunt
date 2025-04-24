@@ -98,6 +98,13 @@ export default function HotspotsOverlay({ progress, unlockedIndex, onClickMarker
 
   const hotspots = calculateHotspots();
 
+  // Calculate scale factor based on viewport size
+  const baseViewportSize = 800; // Base viewport width for scaling
+  const scale = Math.min(
+    Math.max(viewportSize.width / baseViewportSize, 1), // Minimum scale of 1
+    1.5 // Maximum scale of 1.5
+  );
+
   return (
     <div className={`absolute inset-0 z-10 transition-opacity duration-500 ${isVisible ? "opacity-100" : "opacity-0"}`}>
       <svg 
@@ -126,7 +133,7 @@ export default function HotspotsOverlay({ progress, unlockedIndex, onClickMarker
               key={`line-${idx}`}
               d={curve}
               stroke="#fbbf24"
-              strokeWidth="4"
+              strokeWidth={4 * scale} // Scale the line width
               strokeDasharray="6,4"
               fill="none"
             >
@@ -149,6 +156,7 @@ export default function HotspotsOverlay({ progress, unlockedIndex, onClickMarker
             id={id}
             cx={cx}
             cy={cy}
+            scale={scale}
             progress={progress}
             unlockedIndex={unlockedIndex}
             onClickMarker={onClickMarker}
