@@ -58,7 +58,7 @@ export default function LandmarkModal({ user, activeLandmark, progress, onClose,
         setIsFirstUnlock(firstUnlock);
         
         const successMessage = firstUnlock 
-          ? GAME_RULES.messages.success.landmarkUnlock(GAME_RULES.points.landmarkUnlock)
+          ? GAME_RULES.tasks.landmarkUnlock.message(GAME_RULES.tasks.landmarkUnlock.points)
           : "✅ 通關成功！";
         
         setMessage(successMessage);
@@ -68,14 +68,14 @@ export default function LandmarkModal({ user, activeLandmark, progress, onClose,
         if (firstUnlock) {
           setTimeout(() => {
             handleClose();
-          }, 5000); // Show for 3 seconds
+          }, 5000); // Show for 5 seconds
         }
       } else {
-        setMessage(GAME_RULES.messages.error.wrongPassword);
+        setMessage(GAME_RULES.errorMessages.wrongPassword);
         setIsSuccess(false);
       }
     } else {
-      setMessage(GAME_RULES.messages.error.noPassword);
+      setMessage(GAME_RULES.errorMessages.noPassword);
       setIsSuccess(false);
     }
   };

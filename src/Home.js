@@ -9,8 +9,11 @@ import Badges from "./components/Home/Badges";
 import LandmarkModal from "./components/Home/LandmarkModal";
 import AchievementNotification from "./components/Home/AchievementNotification";
 import HotspotsOverlay from "./components/Home/HotspotsOverlay";
+import CheckInButton from "./components/Home/CheckInButton";
+import { GAME_RULES } from "./config/gameRules";
+import { updateDiamondPoints } from "./utils/pointsManager";
 
-const START_DATE = new Date("2025-04-22T00:00:00");
+const START_DATE = new Date("2025-04-21T00:00:00");
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -26,6 +29,7 @@ export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isBadgesOpen, setIsBadgesOpen] = useState(false);
   const [showDiamondBonus, setShowDiamondBonus] = useState(false);
+  const [diamondBonusType, setDiamondBonusType] = useState(null);
   const [viewportSize, setViewportSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight
@@ -120,19 +124,20 @@ export default function Home() {
     const newCompleted = Object.values(newProgress || {}).filter(Boolean).length;
     
     if (newCompleted > oldCompleted) {
-      // A new landmark was unlocked, increment diamond points
-      const newDiamondPoints = (diamondPoints || 0) + 10;
-      setDiamondPoints(newDiamondPoints);
+      // Update points using the points manager
+      await updateDiamondPoints({
+        user,
+        taskId: 'landmarkUnlock',
+        currentPoints: diamondPoints,
+        setDiamondPoints,
+        setShowDiamondBonus,
+        setDiamondBonusType
+      });
       
-      // Show diamond bonus notification
-      setShowDiamondBonus(true);
-      setTimeout(() => setShowDiamondBonus(false), 2000);
-      
-      // Update Firebase
+      // Update Firebase with new progress
       if (user) {
         await setDoc(doc(db, "users", user.uid), { 
-          progress: newProgress,
-          diamondPoints: newDiamondPoints 
+          progress: newProgress
         }, { merge: true });
       }
     }
@@ -188,10 +193,12 @@ export default function Home() {
 
       {/* Diamond Bonus Notification */}
       {showDiamondBonus && (
-        <div className="fixed bottom-24 left-4 z-30 animate-bounce">
+        <div className="fixed top-24 left-4 z-30 animate-bounce">
           <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-3 flex items-center gap-2">
             <span className="text-lg">💎</span>
-            <span className="text-lg font-semibold text-indigo-600">+10</span>
+            <span className="text-lg font-semibold text-indigo-600">
+              +{GAME_RULES.tasks[diamondBonusType === 'landmark' ? 'landmarkUnlock' : 'dailyCheckIn'].points}
+            </span>
           </div>
         </div>
       )}
@@ -201,7 +208,7 @@ export default function Home() {
         <div className="md:w-64 w-48">
           <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-2 md:p-4">
             <div className="flex justify-between items-center mb-2">
-              <h2 className="text-sm md:text-lg font-semibold text-gray-800">{userData?.name || '玩家'} 的徽章成就</h2>
+              <h2 className="text-sm md:text-lg font-semibold text-gray-800">{userData?.name || '玩家'} 的成就</h2>
               <div className="flex items-center gap-2">
                 <span className="text-sm font-medium text-indigo-600">💎 {diamondPoints}</span>
                 <button 
@@ -225,6 +232,17 @@ export default function Home() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Check-in Button */}
+      <div className="fixed bottom-4 right-4 z-20">
+        <CheckInButton 
+          user={user} 
+          diamondPoints={diamondPoints}
+          setDiamondPoints={setDiamondPoints}
+          setShowDiamondBonus={setShowDiamondBonus}
+          setDiamondBonusType={setDiamondBonusType}
+        />
       </div>
 
       {/* Map Background */}

@@ -1,15 +1,22 @@
 export const GAME_RULES = {
-  points: {
-    landmarkUnlock: 10, // Points earned for unlocking a landmark
+  tasks: {
+    landmarkUnlock: {
+      id: 'landmarkUnlock',
+      points: 10,
+      message: (points) => `✅ 通關成功！\n💎 +${points} 鑽石`,
+      type: 'landmark'
+    },
+    dailyCheckIn: {
+      id: 'dailyCheckIn',
+      points: 5,
+      message: (points) => `✅ 簽到成功！\n💎 +${points} 鑽石`,
+      type: 'daily'
+    }
   },
-  messages: {
-    success: {
-      landmarkUnlock: (points) => `✅ 通關成功！\n💎 +${points} 鑽石`,
-    },
-    error: {
-      wrongPassword: "❌ 密語錯誤，請再試一次",
-      noPassword: "⚠️ 此地標尚未設置密語",
-    },
+  errorMessages: {
+    wrongPassword: "❌ 密語錯誤，請再試一次",
+    noPassword: "⚠️ 此地標尚未設置密語",
+    alreadyCheckedIn: "⚠️ 今天已經簽到過了",
   },
   achievements: {
     firstStep: {
