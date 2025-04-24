@@ -10,7 +10,7 @@ import Badges from "./components/Home/Badges";
 import LandmarkModal from "./components/Home/LandmarkModal";
 import AchievementNotification from "./components/Home/AchievementNotification";
 
-const START_DATE = new Date("2025-04-23T00:00:00");
+const START_DATE = new Date("2025-04-22T00:00:00");
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -22,6 +22,7 @@ export default function Home() {
   const [countdown, setCountdown] = useState("");
   const [earned, setEarned] = useState({});
   const [prevEarned, setPrevEarned] = useState({});
+  const [showAchievement, setShowAchievement] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -76,16 +77,30 @@ export default function Home() {
       halfWay: totalCompleted >= 3,
       completed: totalCompleted === 7
     };
-    setPrevEarned(earned);
-    setEarned(newEarned);
-  }, [progress]);
+    
+    // Only show achievement if modal is not active
+    if (!activeLandmark) {
+      setPrevEarned(earned);
+      setEarned(newEarned);
+      setShowAchievement(true);
+    }
+  }, [progress, activeLandmark]);
 
   const handleLandmarkClick = (id) => {
     setActiveLandmark(id);
+    setShowAchievement(false);
   };
 
   const handleProgressUpdate = (newProgress) => {
     setProgress(newProgress);
+  };
+
+  const handleModalClose = () => {
+    setActiveLandmark(null);
+    // Show achievement after a short delay when modal closes
+    setTimeout(() => {
+      setShowAchievement(true);
+    }, 500);
   };
 
   if (!user || !userData?.profileCompleted) return null;
@@ -119,10 +134,12 @@ export default function Home() {
         user={user}
         activeLandmark={activeLandmark}
         progress={progress}
-        onClose={() => setActiveLandmark(null)}
+        onClose={handleModalClose}
         onProgressUpdate={handleProgressUpdate}
       />
-      <AchievementNotification earned={earned} prevEarned={prevEarned} />
+      {showAchievement && (
+        <AchievementNotification earned={earned} prevEarned={prevEarned} />
+      )}
     </div>
   );
 }

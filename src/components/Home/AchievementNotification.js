@@ -1,6 +1,5 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
-import Confetti from "react-confetti";
 import badges from "../../data/badges.json";
 
 export default function AchievementNotification({ earned, prevEarned }) {
@@ -55,14 +54,6 @@ export default function AchievementNotification({ earned, prevEarned }) {
     <>
       {showNotification && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-          <Confetti
-            width={windowSize.width}
-            height={windowSize.height}
-            recycle={false}
-            numberOfPieces={200}
-            gravity={0.3}
-            style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%' }}
-          />
           <AnimatePresence>
             {achievement && (
               <motion.div
@@ -72,17 +63,27 @@ export default function AchievementNotification({ earned, prevEarned }) {
                 transition={{ type: "spring", damping: 20, stiffness: 300 }}
                 className="relative z-[10000]"
               >
-                <div className="bg-white rounded-lg shadow-lg p-8 border-l-4 border-yellow-500 min-w-[320px] max-w-[90vw]">
-                  <div className="flex flex-col items-center gap-4">
-                    <img
-                      src={`/icons/${achievement.icon}`}
-                      alt={achievement.label}
-                      className="w-20 h-20"
-                    />
-                    <div className="text-center">
-                      <h3 className="font-bold text-2xl text-gray-800">成就解鎖！</h3>
-                      <p className="text-gray-600 text-xl mt-3">{achievement.label}</p>
-                      <p className="text-sm text-gray-500 mt-2">{achievement.description}</p>
+                <div className="relative">
+                  {/* Glowing effect */}
+                  <div className="absolute inset-0 bg-yellow-400 rounded-full blur-xl animate-pulse" />
+                  <div className="absolute inset-0 bg-yellow-300 rounded-full blur-lg animate-ping" />
+                  
+                  {/* Main content */}
+                  <div className="relative bg-white rounded-lg shadow-lg p-8 border-l-4 border-yellow-500 min-w-[320px] max-w-[90vw]">
+                    <div className="flex flex-col items-center gap-4">
+                      <div className="relative">
+                        <div className="absolute inset-0 bg-yellow-400 rounded-full blur-xl animate-pulse" />
+                        <img
+                          src={`/icons/${achievement.icon}`}
+                          alt={achievement.label}
+                          className="relative w-20 h-20"
+                        />
+                      </div>
+                      <div className="text-center">
+                        <h3 className="font-bold text-2xl text-gray-800">成就解鎖！</h3>
+                        <p className="text-gray-600 text-xl mt-3">{achievement.label}</p>
+                        <p className="text-sm text-gray-500 mt-2">{achievement.description}</p>
+                      </div>
                     </div>
                   </div>
                 </div>
