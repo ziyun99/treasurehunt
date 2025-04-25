@@ -65,7 +65,7 @@ export default function MusicPlayer({ user }) {
             musicMuted: false
           });
           setIsPlaying(true);
-          setVolume(0.5);
+          setVolume(0.3);
           setIsMuted(false);
         }
       }

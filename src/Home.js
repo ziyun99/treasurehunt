@@ -257,15 +257,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* Daily Chest */}
-      <DailyChest 
-        user={user}
-        diamondPoints={diamondPoints}
-        setDiamondPoints={setDiamondPoints}
-        setShowDiamondBonus={setShowDiamondBonus}
-        setDiamondBonusType={setDiamondBonusType}
-      />
-
       {/* Music Player */}
       <MusicPlayer user={user} />
 
@@ -294,7 +285,16 @@ export default function Home() {
         </svg>
       </div>
 
-      {/* Hotspots Overlay */}
+      {/* Daily Chest */}
+      <DailyChest 
+        user={user}
+        diamondPoints={diamondPoints}
+        setDiamondPoints={setDiamondPoints}
+        setShowDiamondBonus={setShowDiamondBonus}
+        setDiamondBonusType={setDiamondBonusType}
+      />
+
+      {/* LandmarkChest Overlay */}
       <div className="w-full h-screen absolute inset-0">
         <LandmarkOverlay
           progress={progress}
@@ -310,6 +310,7 @@ export default function Home() {
         onClose={handleModalClose}
         onProgressUpdate={handleProgressUpdate}
       />
+
       {showAchievement && (
         <AchievementNotification earned={earned} prevEarned={prevEarned} />
       )}

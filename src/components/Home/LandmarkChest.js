@@ -88,7 +88,6 @@ export default function LandmarkChest({
     top: `${cy - iconOffset}px`
   });
 
-  console.log('Rendering Hotspot:', id, 'ShowModal:', showModal, 'Progress:', progress[id]);
 
   const modal = showModal && progress[id] ? createPortal(
     <div style={{
