@@ -6,10 +6,10 @@ import { doc, getDoc, setDoc } from "firebase/firestore";
 import Title from "./components/Home/Title";
 import Menubar from "./components/Home/Menubar";
 import Badges from "./components/Home/Badges";
-import LandmarkModal from "./components/Home/LandmarkModal";
+import LandmarkModal from "./components/modals/LandmarkModal";
 import AchievementNotification from "./components/Home/AchievementNotification";
-import LandmarkOverlay from "./components/Home/LandmarkOverlay";
-import DailyChest from "./components/Home/DailyChest";
+import LandmarkChestOverlay from "./components/Home/LandmarkChestOverlay";
+import DailyChest from "./components/Chest/DailyChest";
 import MusicPlayer from "./components/Home/MusicPlayer";
 import { GAME_RULES } from "./config/gameRules";
 import { updateDiamondPoints } from "./utils/pointsManager";
@@ -296,7 +296,7 @@ export default function Home() {
 
       {/* LandmarkChest Overlay */}
       <div className="w-full h-screen absolute inset-0">
-        <LandmarkOverlay
+        <LandmarkChestOverlay
           progress={progress}
           unlockedIndex={getUnlockedIndex()}
           onClickMarker={handleLandmarkClick}

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from 'framer-motion';
-import BaseChest from "./BaseChest";
+import BaseChest from './BaseChest';
 
 const quotes = [
   {

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import AnimatedChest from './AnimatedChest';
 import ChestLabel from './ChestLabel';
-import QuoteModal from './QuoteModal';
+import QuoteModal from '../modals/QuoteModal';
 
 const quotes = [
   {

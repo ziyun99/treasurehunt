@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import LandmarkChest from "./LandmarkChest";
+import LandmarkChest from "../Chest/LandmarkChest";
 
 // Seeded random number generator for consistent patterns
 const seededRandom = (seed) => {
@@ -7,7 +7,7 @@ const seededRandom = (seed) => {
   return x - Math.floor(x);
 };
 
-export default function LandmarkOverlay({ progress, unlockedIndex, onClickMarker }) {
+export default function LandmarkChestOverlay({ progress, unlockedIndex, onClickMarker }) {
   const [isVisible, setIsVisible] = useState(false);
   const [viewportSize, setViewportSize] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 800,
