@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 
 const quotes = [
   {
@@ -24,7 +25,7 @@ const quotes = [
   }
 ];
 
-export default function MotivationQuoteModal({ isOpen, onClose }) {
+export default function QuoteModal({ isOpen, onClose }) {
   const [currentQuote, setCurrentQuote] = useState(null);
 
   useEffect(() => {
@@ -36,7 +37,7 @@ export default function MotivationQuoteModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
-  return (
+  return createPortal(
     <div style={{
       position: 'fixed',
       top: 0,
@@ -99,6 +100,7 @@ export default function MotivationQuoteModal({ isOpen, onClose }) {
           </svg>
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 } 
