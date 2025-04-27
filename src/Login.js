@@ -2,6 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from './firebase';
 import { GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import './styles/fonts.css';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -18,8 +19,10 @@ export default function Login() {
 
   return (
     <div className="min-h-screen bg-yellow-50 flex items-center justify-center p-4">
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h1 className="text-3xl font-bold text-yellow-800 text-center mb-6">黃金尋寶秘笈 4.0</h1>
+      <div className="bg-white p-4 sm:p-6 md:p-8 rounded-lg shadow-lg w-full max-w-md">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-['XingShu'] text-yellow-800 text-center mb-4 sm:mb-6 md:mb-8 px-4 sm:px-6 md:px-8 pt-4 sm:pt-6 md:pt-8">
+          黃金尋寶秘笈
+        </h1>
         <div className="space-y-4">
           <button
             onClick={handleGoogleLogin}

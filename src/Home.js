@@ -161,34 +161,29 @@ export default function Home() {
 
       {/* Floating Menubar */}
       <div className="fixed top-4 right-4 z-20">
-        <div className="md:block hidden">
-          <Menubar user={user} />
-        </div>
-        <div className="md:hidden block">
-          <button 
-            onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className="p-2 rounded-lg bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white transition-colors duration-200"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
-          {isMenuOpen && (
-            <>
-              {/* Backdrop */}
-              <div 
-                className="fixed inset-0 bg-black/20 z-20"
-                onClick={() => setIsMenuOpen(false)}
-              />
-              {/* Menu Dropdown */}
-              <div className="absolute right-0 mt-2 w-56 rounded-lg bg-white/95 shadow-xl transform transition-all duration-200 ease-in-out z-30">
-                <div className="p-3">
-                  <Menubar user={user} isVertical={true} />
-                </div>
+        <button 
+          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          className="p-2 rounded-lg bg-white/90 backdrop-blur-sm shadow-lg hover:bg-white transition-colors duration-200"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+        {isMenuOpen && (
+          <>
+            {/* Backdrop */}
+            <div 
+              className="fixed inset-0 bg-black/20 z-20"
+              onClick={() => setIsMenuOpen(false)}
+            />
+            {/* Menu Dropdown */}
+            <div className="absolute right-0 mt-2 w-56 rounded-lg bg-white/95 shadow-xl transform transition-all duration-200 ease-in-out z-30">
+              <div className="p-3">
+                <Menubar user={user} isVertical={true} />
               </div>
-            </>
-          )}
-        </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Diamond Bonus Notification */}
