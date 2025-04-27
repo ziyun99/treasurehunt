@@ -16,7 +16,7 @@ export const GAME_RULES = {
   errorMessages: {
     wrongPassword: "❌ 密語錯誤，請再試一次",
     noPassword: "⚠️ 此地標尚未設置密語",
-    alreadyCheckedIn: "⚠️ 今天已經簽到過了",
+    alreadyCheckedIn: "⚠️ 今天已經簽到過了"
   },
   achievements: {
     firstStep: {

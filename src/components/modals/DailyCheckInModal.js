@@ -1,40 +1,7 @@
-import { motion, AnimatePresence } from 'framer-motion';
-import { useEffect, useState } from 'react';
+import { motion } from 'framer-motion';
 import { createPortal } from 'react-dom';
 
-const quotes = [
-  {
-    text: "每一次的探索都是心靈的冒險，每一次的發現都是智慧的結晶。",
-    author: "探索者"
-  },
-  {
-    text: "在知識的海洋中，每一滴汗水都是智慧的珍珠。",
-    author: "智者"
-  },
-  {
-    text: "好奇心是探索的鑰匙，堅持是成功的密碼。",
-    author: "冒險家"
-  },
-  {
-    text: "每一個密碼背後，都藏著一個等待被發現的故事。",
-    author: "解謎者"
-  },
-  {
-    text: "智慧不在於知道多少，而在於如何運用所學。",
-    author: "導師"
-  }
-];
-
-export default function QuoteModal({ isOpen, onClose }) {
-  const [currentQuote, setCurrentQuote] = useState(null);
-
-  useEffect(() => {
-    if (isOpen) {
-      const randomIndex = Math.floor(Math.random() * quotes.length);
-      setCurrentQuote(quotes[randomIndex]);
-    }
-  }, [isOpen]);
-
+export default function DailyCheckInModal({ isOpen, onClose, onCheckIn }) {
   if (!isOpen) return null;
 
   return createPortal(
@@ -63,30 +30,34 @@ export default function QuoteModal({ isOpen, onClose }) {
       }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '2.5rem', marginBottom: '1.5rem' }}>✨</div>
-          {currentQuote && (
-            <>
-              <p style={{ 
-                marginBottom: '1.5rem', 
-                fontSize: '1.25rem', 
-                fontWeight: 500,
-                lineHeight: 1.6
-              }}>
-                "{currentQuote.text}"
-              </p>
-              <p style={{ 
-                fontSize: '0.875rem', 
-                color: 'rgba(255, 255, 255, 0.8)'
-              }}>
-                — {currentQuote.author}
-              </p>
-            </>
-          )}
+          <p style={{ 
+            marginBottom: '1.5rem', 
+            fontSize: '1.25rem', 
+            fontWeight: 500,
+            lineHeight: 1.6
+          }}>
+            今日簽到（+5💎）
+          </p>
+          <button
+            onClick={onCheckIn}
+            style={{
+              padding: '0.75rem 2rem',
+              borderRadius: '0.5rem',
+              background: 'white',
+              color: 'rgba(99, 102, 241, 0.9)',
+              fontWeight: 600,
+              fontSize: '1rem',
+              transition: 'all 0.2s',
+              cursor: 'pointer'
+            }}
+            onMouseOver={e => e.currentTarget.style.transform = 'scale(1.05)'}
+            onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
+          >
+            簽到
+          </button>
         </div>
         <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onClose();
-          }}
+          onClick={onClose}
           style={{
             position: 'absolute',
             top: '1rem',

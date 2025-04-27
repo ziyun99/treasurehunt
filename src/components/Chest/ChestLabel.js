@@ -8,11 +8,6 @@ export default function ChestLabel({
 }) {
   const getLabel = () => {
     if (customLabel) return customLabel;
-    
-    if (type === 'daily') {
-      return state === 'completed' ? '今日簽到成功' : '每日簽到';
-    }
-    
     return '';
   };
 

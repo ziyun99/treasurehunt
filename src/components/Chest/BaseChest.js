@@ -42,11 +42,13 @@ export default function BaseChest({
 }) {
   const [showModal, setShowModal] = useState(false);
 
-  const handleClick = () => {
+  const handleClick = (e) => {
+    console.log('handleClick', type, state);
+    e.stopPropagation();
     if (state === 'completed') {
       setShowModal(true);
     } else if (onClick) {
-      onClick();
+      onClick(e);
     }
   };
 
@@ -71,8 +73,9 @@ export default function BaseChest({
 
   return (
     <div 
-      className="fixed z-20"
+      className="fixed z-20 cursor-pointer"
       style={position}
+      onClick={handleClick}
     >
       <div className="relative">
         <AnimatedChest
@@ -92,6 +95,7 @@ export default function BaseChest({
       <QuoteModal 
         isOpen={showModal} 
         onClose={handleCloseModal}
+        quotes={quotes}
       />
     </div>
   );

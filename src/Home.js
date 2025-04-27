@@ -8,13 +8,12 @@ import Menubar from "./components/Home/Menubar";
 import Badges from "./components/Home/Badges";
 import LandmarkModal from "./components/modals/LandmarkModal";
 import AchievementNotification from "./components/Home/AchievementNotification";
-import LandmarkChestOverlay from "./components/Home/LandmarkChestOverlay";
-import DailyChest from "./components/Chest/DailyChest";
+import ChestOverlay from "./components/Home/ChestOverlay";
 import MusicPlayer from "./components/Home/MusicPlayer";
 import { GAME_RULES } from "./config/gameRules";
 import { updateDiamondPoints } from "./utils/pointsManager";
 
-const START_DATE = new Date("2025-04-21T00:00:00");
+const START_DATE = new Date("2025-04-24T00:00:00");
 
 export default function Home() {
   const [user, setUser] = useState(null);
@@ -37,7 +36,6 @@ export default function Home() {
   });
   const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth);
   const [diamondPoints, setDiamondPoints] = useState(0);
-  const [isCheckedIn, setIsCheckedIn] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -150,24 +148,6 @@ export default function Home() {
     setTimeout(() => {
       setShowAchievement(true);
     }, 500);
-  };
-
-  const handleCheckIn = async () => {
-    if (user) {
-      setIsCheckedIn(true);
-      await updateDiamondPoints({
-        user,
-        taskId: 'dailyCheckIn',
-        currentPoints: diamondPoints,
-        setDiamondPoints,
-        setShowDiamondBonus,
-        setDiamondBonusType
-      });
-      await setDoc(doc(db, "users", user.uid), { 
-        progress: { dailyCheckIn: true },
-        diamondPoints: diamondPoints + GAME_RULES.tasks.dailyCheckIn.points
-      }, { merge: true });
-    }
   };
 
   if (!user || !userData?.profileCompleted) return null;
@@ -285,21 +265,17 @@ export default function Home() {
         </svg>
       </div>
 
-      {/* Daily Chest */}
-      <DailyChest 
-        user={user}
-        diamondPoints={diamondPoints}
-        setDiamondPoints={setDiamondPoints}
-        setShowDiamondBonus={setShowDiamondBonus}
-        setDiamondBonusType={setDiamondBonusType}
-      />
-
-      {/* LandmarkChest Overlay */}
       <div className="w-full h-screen absolute inset-0">
-        <LandmarkChestOverlay
+        {/* Combined Chest Overlay */}
+        <ChestOverlay
           progress={progress}
           unlockedIndex={getUnlockedIndex()}
           onClickMarker={handleLandmarkClick}
+          diamondPoints={diamondPoints}
+          setDiamondPoints={setDiamondPoints}
+          setShowDiamondBonus={setShowDiamondBonus}
+          setDiamondBonusType={setDiamondBonusType}
+          user={user}
         />
       </div>
 
