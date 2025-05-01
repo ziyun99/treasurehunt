@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "./firebase";
 import { onAuthStateChanged } from "firebase/auth";
@@ -36,6 +36,9 @@ export default function Home() {
   });
   const [isPortrait, setIsPortrait] = useState(window.innerHeight > window.innerWidth);
   const [diamondPoints, setDiamondPoints] = useState(0);
+  const [isMapAnimationComplete, setIsMapAnimationComplete] = useState(false);
+  const audioContextRef = useRef(null);
+  const hasPlayedSoundRef = useRef(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -90,6 +93,51 @@ export default function Home() {
     }, 1000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    // Initialize audio context
+    audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Resume audio context on any user interaction
+    const resumeAudio = () => {
+      if (audioContextRef.current && audioContextRef.current.state === 'suspended') {
+        audioContextRef.current.resume();
+      }
+    };
+    
+    window.addEventListener('click', resumeAudio);
+    window.addEventListener('keydown', resumeAudio);
+    window.addEventListener('touchstart', resumeAudio);
+    
+    return () => {
+      window.removeEventListener('click', resumeAudio);
+      window.removeEventListener('keydown', resumeAudio);
+      window.removeEventListener('touchstart', resumeAudio);
+    };
+  }, []);
+
+  const playScrollSound = async () => {
+    try {
+      if (!audioContextRef.current) return;
+      
+      const response = await fetch(`${process.env.PUBLIC_URL}/scroll-unroll.mp3`);
+      const arrayBuffer = await response.arrayBuffer();
+      const audioBuffer = await audioContextRef.current.decodeAudioData(arrayBuffer);
+      
+      const source = audioContextRef.current.createBufferSource();
+      const gainNode = audioContextRef.current.createGain();
+      
+      source.buffer = audioBuffer;
+      gainNode.gain.value = 0.5; // Adjust volume
+      
+      source.connect(gainNode);
+      gainNode.connect(audioContextRef.current.destination);
+      
+      source.start(0);
+    } catch (error) {
+      console.log('Audio playback failed:', error);
+    }
+  };
 
   const getUnlockedIndex = () => {
     const today = new Date();
@@ -237,41 +285,86 @@ export default function Home() {
 
       {/* Map Background */}
       <div className="w-full h-screen absolute inset-0 overflow-hidden">
-        <svg 
-          className="w-full h-full"
-          viewBox={`0 0 ${viewportSize.width} ${viewportSize.height}`}
-          preserveAspectRatio="none"
-          style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0
-          }}
-        >
-          <image
-            href={`${process.env.PUBLIC_URL}/${isPortrait ? 'map-vertical.svg' : 'map.svg'}`}
-            x="0"
-            y="0"
-            width={viewportSize.width}
-            height={viewportSize.height}
-            preserveAspectRatio="none"
-          />
-        </svg>
+        <div className="relative w-full h-full">
+          {/* Animated Map */}
+          <div 
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              isMapAnimationComplete ? 'opacity-0' : 'opacity-100'
+            }`}
+          >
+            <img
+              src={`${process.env.PUBLIC_URL}/${isPortrait ? 'map-vertical.gif' : 'map.gif'}`}
+              alt="Map Animation"
+              className="w-full h-full"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                width: '100%',
+                height: '100%',
+                objectFit: 'fill'
+              }}
+              onLoad={() => {
+                // Play scroll sound only once when GIF first loads
+                if (!hasPlayedSoundRef.current) {
+                  playScrollSound();
+                  hasPlayedSoundRef.current = true;
+                }
+                // Wait for the GIF to complete (assuming it's 3 seconds)
+                setTimeout(() => {
+                  setIsMapAnimationComplete(true);
+                }, 3000);
+              }}
+            />
+          </div>
+          
+          {/* Regular Map */}
+          <div 
+            className={`absolute inset-0 transition-opacity duration-1000 ${
+              isMapAnimationComplete ? 'opacity-100' : 'opacity-0'
+            }`}
+          >
+            <svg 
+              className="w-full h-full"
+              viewBox={`0 0 ${viewportSize.width} ${viewportSize.height}`}
+              preserveAspectRatio="none"
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0
+              }}
+            >
+              <image
+                href={`${process.env.PUBLIC_URL}/${isPortrait ? 'map-vertical.svg' : 'map.svg'}`}
+                x="0"
+                y="0"
+                width={viewportSize.width}
+                height={viewportSize.height}
+                preserveAspectRatio="none"
+              />
+            </svg>
+          </div>
+        </div>
       </div>
 
       <div className="w-full h-screen absolute inset-0">
         {/* Combined Chest Overlay */}
-        <ChestOverlay
-          progress={progress}
-          unlockedIndex={getUnlockedIndex()}
-          onClickMarker={handleLandmarkClick}
-          diamondPoints={diamondPoints}
-          setDiamondPoints={setDiamondPoints}
-          setShowDiamondBonus={setShowDiamondBonus}
-          setDiamondBonusType={setDiamondBonusType}
-          user={user}
-        />
+        {isMapAnimationComplete && (
+          <ChestOverlay
+            progress={progress}
+            unlockedIndex={getUnlockedIndex()}
+            onClickMarker={handleLandmarkClick}
+            diamondPoints={diamondPoints}
+            setDiamondPoints={setDiamondPoints}
+            setShowDiamondBonus={setShowDiamondBonus}
+            setDiamondBonusType={setDiamondBonusType}
+            user={user}
+          />
+        )}
       </div>
 
       <LandmarkModal
