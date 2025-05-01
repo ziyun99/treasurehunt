@@ -3,8 +3,8 @@ import '../../styles/fonts.css';
 
 export default function Title({ countdown }) {
   return (
-    <div className="text-center mb-4 sm:mb-6 md:mb-8 pt-4 sm:pt-6 md:pt-8">
-      <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl font-['XingShu'] text-yellow-800 mb-2 px-4 sm:px-6 md:px-8">
+    <div className="text-center mb-4 sm:mb-6 md:mb-8 pt-4 sm:pt-6 md:pt-8 portrait:pt-2">
+      <h1 className="text-5xl sm:text-5xl md:text-6xl lg:text-6xl font-['XingShu'] text-yellow-800 mb-2 px-4 sm:px-6 md:px-8 whitespace-nowrap">
         黃金尋寶秘笈
       </h1>
       {/* {countdown && (
