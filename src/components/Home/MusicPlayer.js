@@ -1,82 +1,81 @@
 import { useState, useEffect, useRef } from 'react';
-import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore';
-import { db } from '../../firebase';
 
-export default function MusicPlayer({ user }) {
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.5);
-  const [isMuted, setIsMuted] = useState(false);
-  const [showVolume, setShowVolume] = useState(false);
+const MUSIC_FILES = [
+  { name: '喜迎人生', path: '/music/喜迎人生.mp3' },
+  { name: '因為有太陽', path: '/music/因為有太陽.mp3' },
+  { name: '天賜活力', path: '/music/天賜活力.mp3' },
+  { name: '如願圓通', path: '/music/如願圓通.mp3' },
+  { name: '快樂工廠', path: '/music/快樂工廠.mp3' },
+  { name: '莫擦肩而過', path: '/music/莫擦肩而過.mp3' },
+  { name: '輕鬆', path: '/music/輕鬆.mp3' },
+  { name: '黃金娃娃ing', path: '/music/黃金娃娃ing.mp3' },
+];
+
+export default function MusicPlayer() {
+  const [isPlaying, setIsPlaying] = useState(() => {
+    // Initialize from localStorage or default to true
+    const savedState = localStorage.getItem('musicPlaying');
+    return savedState ? JSON.parse(savedState) : true;
+  });
+  const [currentMusic, setCurrentMusic] = useState(() => {
+    // Initialize from localStorage or default to first song
+    const savedMusic = localStorage.getItem('currentMusic');
+    return savedMusic ? JSON.parse(savedMusic) : MUSIC_FILES[0];
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPlaylist, setShowPlaylist] = useState(false);
   const audioRef = useRef(null);
-  const volumeTimeoutRef = useRef(null);
-  const isInitialized = useRef(false);
+  const wasPlayingRef = useRef(true);
+  const playlistRef = useRef(null);
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem('musicPlaying', JSON.stringify(isPlaying));
+  }, [isPlaying]);
 
   useEffect(() => {
-    // Initialize audio element
-    if (audioRef.current && !isInitialized.current) {
-      audioRef.current.volume = volume;
-      isInitialized.current = true;
-    }
+    localStorage.setItem('currentMusic', JSON.stringify(currentMusic));
+  }, [currentMusic]);
+
+  // Handle click outside to close playlist
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (playlistRef.current && !playlistRef.current.contains(event.target)) {
+        setShowPlaylist(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
   }, []);
 
+  // Handle visibility change
   useEffect(() => {
-    // Load user's music preference from Firestore
-    const loadUserPreference = async () => {
-      if (user) {
-        const userRef = doc(db, "users", user.uid);
-        const userDoc = await getDoc(userRef);
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          // Default to true if no preference exists
-          const musicEnabled = data?.musicEnabled ?? true;
-          setIsPlaying(musicEnabled);
-          setVolume(data?.musicVolume ?? 0.5);
-          setIsMuted(data?.musicMuted ?? false);
-          
-          // Sync audio state with user preference
-          if (audioRef.current) {
-            audioRef.current.volume = isMuted ? 0 : volume;
-            if (musicEnabled) {
-              try {
-                const playPromise = audioRef.current.play();
-                if (playPromise !== undefined) {
-                  playPromise
-                    .then(() => {
-                      console.log("Audio playback started successfully");
-                    })
-                    .catch(error => {
-                      console.error("Error playing audio:", error);
-                      setIsPlaying(false);
-                    });
-                }
-              } catch (error) {
-                console.error("Error in play attempt:", error);
-                setIsPlaying(false);
-              }
-            } else {
-              audioRef.current.pause();
-            }
-          }
-        } else {
-          // For new users, set default preferences
-          await setDoc(userRef, {
-            musicEnabled: true,
-            musicVolume: 0.3,
-            musicMuted: false
-          });
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Tab is hidden, pause music
+        wasPlayingRef.current = isPlaying;
+        setIsPlaying(false);
+      } else {
+        // Tab is visible again, resume if it was playing
+        if (wasPlayingRef.current) {
           setIsPlaying(true);
-          setVolume(0.3);
-          setIsMuted(false);
         }
       }
     };
-    loadUserPreference();
-  }, [user, volume, isMuted]);
 
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [isPlaying]);
+
+  // Handle play/pause
   useEffect(() => {
     const audio = audioRef.current;
     if (audio) {
-      audio.volume = isMuted ? 0 : volume;
       if (isPlaying) {
         const playPromise = audio.play();
         if (playPromise !== undefined) {
@@ -94,132 +93,136 @@ export default function MusicPlayer({ user }) {
         console.log("Audio playback paused");
       }
     }
-  }, [isPlaying, volume, isMuted]);
+  }, [isPlaying]);
 
-  const handleMouseEnter = () => {
-    if (volumeTimeoutRef.current) {
-      clearTimeout(volumeTimeoutRef.current);
+  // Handle music change
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (audio) {
+      const handleLoadedData = () => {
+        setIsLoading(false);
+        if (isPlaying) {
+          const playPromise = audio.play();
+          if (playPromise !== undefined) {
+            playPromise
+              .then(() => {
+                console.log("New track started successfully");
+              })
+              .catch(error => {
+                console.error("Error playing new track:", error);
+                setIsPlaying(false);
+              });
+          }
+        }
+      };
+
+      audio.addEventListener('loadeddata', handleLoadedData);
+      return () => {
+        audio.removeEventListener('loadeddata', handleLoadedData);
+      };
     }
-    setShowVolume(true);
-  };
+  }, [currentMusic, isPlaying]);
 
-  const handleMouseLeave = () => {
-    volumeTimeoutRef.current = setTimeout(() => {
-      setShowVolume(false);
-    }, 500); // Hide after 500ms of no interaction
-  };
-
-  const togglePlay = async () => {
-    const newState = !isPlaying;
-    setIsPlaying(newState);
+  const handleMusicChange = (music) => {
+    setIsLoading(true);
+    setCurrentMusic(music);
+    setShowPlaylist(false);
     
-    // Save preference to Firestore
-    if (user) {
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
-        musicEnabled: newState
-      });
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.load();
     }
   };
 
-  const toggleMute = async () => {
-    const newMutedState = !isMuted;
-    setIsMuted(newMutedState);
-    
-    // Save preference to Firestore
-    if (user) {
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
-        musicMuted: newMutedState
-      });
-    }
-  };
-
-  const handleVolumeChange = async (e) => {
-    const newVolume = parseFloat(e.target.value);
-    setVolume(newVolume);
-    
-    // Save preference to Firestore
-    if (user) {
-      const userRef = doc(db, "users", user.uid);
-      await updateDoc(userRef, {
-        musicVolume: newVolume
-      });
-    }
+  const togglePlay = () => {
+    setIsPlaying(!isPlaying);
   };
 
   return (
-    <div 
-      className="fixed bottom-4 right-4 z-20"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
+    <div className="fixed bottom-4 right-4 z-20">
+      <div className="flex flex-col items-center gap-2" ref={playlistRef}>
+        <button
+          onClick={togglePlay}
+          className="p-2 rounded-full bg-amber-50/80 backdrop-blur-sm shadow-lg hover:bg-amber-100/50 transition-colors duration-200"
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className="h-5 w-5 text-amber-600 animate-spin" 
+              viewBox="0 0 24 24" 
+              fill="currentColor"
+            >
+              <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z" />
+            </svg>
+          ) : (
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              className={`h-5 w-5 text-amber-600 ${isPlaying ? 'animate-spin' : ''}`} 
+              viewBox="0 0 24 24" 
+              fill="currentColor"
+            >
+              {isPlaying ? (
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" />
+              ) : (
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
+              )}
+            </svg>
+          )}
+        </button>
+
+        <button
+          onClick={() => setShowPlaylist(!showPlaylist)}
+          className="p-2 rounded-full bg-amber-50/80 backdrop-blur-sm shadow-lg hover:bg-amber-100/50 transition-colors duration-200"
+        >
+          <svg 
+            xmlns="http://www.w3.org/2000/svg" 
+            className="h-5 w-5 text-amber-600" 
+            viewBox="0 0 24 24" 
+            fill="currentColor"
+          >
+            <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+          </svg>
+        </button>
+
+        {showPlaylist && (
+          <div className="absolute bottom-full right-0 mb-2 w-48 bg-amber-50/80 backdrop-blur-sm rounded-lg shadow-lg py-1">
+            {MUSIC_FILES.map((music) => (
+              <button
+                key={music.path}
+                onClick={() => handleMusicChange(music)}
+                className={`w-full px-4 py-2 text-left text-sm hover:bg-amber-100/50 transition-colors duration-200 flex items-center gap-2 ${
+                  currentMusic.path === music.path 
+                    ? 'text-amber-600 font-medium bg-amber-100/50' 
+                    : 'text-amber-700'
+                }`}
+              >
+                {currentMusic.path === music.path && (
+                  <svg 
+                    xmlns="http://www.w3.org/2000/svg" 
+                    className="h-4 w-4 text-amber-600" 
+                    viewBox="0 0 24 24" 
+                    fill="currentColor"
+                  >
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
+                  </svg>
+                )}
+                <span className="flex-1">{music.name}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
       <audio 
         ref={audioRef}
         id="background-music" 
         loop
         preload="auto"
       >
-        <source src="/music/bg-music.mp3" type="audio/mpeg" />
+        <source src={currentMusic.path} type="audio/mpeg" />
         Your browser does not support the audio element.
       </audio>
-      
-      <div className="relative flex flex-col items-center">
-        {showVolume && (
-          <div 
-            className="absolute bottom-full mb-2 p-2 bg-amber-50/80 backdrop-blur-sm rounded-lg shadow-lg"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-          >
-            <div className="flex flex-col items-center gap-2">
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.1"
-                value={volume}
-                onChange={handleVolumeChange}
-                className="w-1 h-24 bg-amber-100 rounded-lg appearance-none cursor-pointer accent-amber-500 [writing-mode:vertical-lr] [direction:rtl]"
-                style={{
-                  background: `linear-gradient(to top, rgb(245 158 11) ${volume * 100}%, rgb(254 243 199) ${volume * 100}%)`,
-                  backgroundRepeat: 'no-repeat'
-                }}
-              />
-              <button
-                onClick={toggleMute}
-                className="p-2 rounded-full hover:bg-amber-100 transition-colors duration-200"
-              >
-                {isMuted ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-600" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z" />
-                  </svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-amber-600" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
-                  </svg>
-                )}
-              </button>
-            </div>
-          </div>
-        )}
-        <button
-          onClick={togglePlay}
-          className="p-3 rounded-full bg-amber-50/80 backdrop-blur-sm shadow-lg hover:bg-amber-100 transition-all duration-200"
-        >
-          <svg 
-            xmlns="http://www.w3.org/2000/svg" 
-            className={`h-6 w-6 text-amber-600 ${isPlaying ? 'animate-spin' : ''}`} 
-            viewBox="0 0 24 24" 
-            fill="currentColor"
-          >
-            {isPlaying ? (
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14H9V8h2v8zm4 0h-2V8h2v8z" />
-            ) : (
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z" />
-            )}
-          </svg>
-        </button>
-      </div>
     </div>
   );
 } 
