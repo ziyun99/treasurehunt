@@ -28,7 +28,8 @@ export default function DiamondChest({
   diamondPoints,
   setDiamondPoints,
   setShowDiamondBonus,
-  setDiamondBonusType
+  setDiamondBonusType,
+  image
 }) {
   const [showDiamondModal, setShowDiamondModal] = useState(false);
   const [password, setPassword] = useState(null);
@@ -96,9 +97,7 @@ export default function DiamondChest({
         onClick={handleClick}
         quotes={diamondQuotes}
         showHoverShadow={true}
-        customIcon={`/icons/${state === 'completed' ? 'diamond-light.svg' : 
-                    state === 'locked' ? 'diamond.svg' : 
-                    'diamond.svg'}`}
+        customIcon={image}
       />
       <DiamondModal
         isOpen={showDiamondModal}

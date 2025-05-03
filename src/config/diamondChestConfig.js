@@ -3,21 +3,21 @@ export const diamondChestConfig = {
   images: {
     // First diamond chest images
     diamond1: {
-      locked: `${process.env.PUBLIC_URL}/icons/diamond1-locked.svg`,
-      open: `${process.env.PUBLIC_URL}/icons/diamond1-open.svg`,
-      completed: `${process.env.PUBLIC_URL}/icons/diamond1-completed.svg`
+      locked: `${process.env.PUBLIC_URL}/icons/diamond.svg`,
+      open: `${process.env.PUBLIC_URL}/icons/diamond.svg`,
+      completed: `${process.env.PUBLIC_URL}/icons/diamond-light.svg`
     },
     // Second diamond chest images
     diamond2: {
-      locked: `${process.env.PUBLIC_URL}/icons/diamond2-locked.svg`,
-      open: `${process.env.PUBLIC_URL}/icons/diamond2-open.svg`,
-      completed: `${process.env.PUBLIC_URL}/icons/diamond2-completed.svg`
+      locked: `${process.env.PUBLIC_URL}/icons/diamond.svg`,
+      open: `${process.env.PUBLIC_URL}/icons/diamond.svg`,
+      completed: `${process.env.PUBLIC_URL}/icons/diamond-light.svg`
     },
     // Third diamond chest images
     diamond3: {
-      locked: `${process.env.PUBLIC_URL}/icons/diamond3-locked.svg`,
-      open: `${process.env.PUBLIC_URL}/icons/diamond3-open.svg`,
-      completed: `${process.env.PUBLIC_URL}/icons/diamond3-completed.svg`
+      locked: `${process.env.PUBLIC_URL}/icons/diamond.svg`,
+      open: `${process.env.PUBLIC_URL}/icons/diamond.svg`,
+      completed: `${process.env.PUBLIC_URL}/icons/diamond-light.svg`
     }
   },
 

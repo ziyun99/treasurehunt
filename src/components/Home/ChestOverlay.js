@@ -265,7 +265,6 @@ export default function ChestOverlay({
                 y={-iconOffset}
                 width={iconSize}
                 height={iconSize}
-                className="cursor-not-allowed"
               />
             ) : (
               <foreignObject x={-iconOffset} y={-iconOffset} width={iconSize} height={iconSize} overflow="visible">
