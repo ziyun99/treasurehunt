@@ -108,7 +108,8 @@ export default function UserProfileForm({ onClose }) {
     await setDoc(doc(db, "users", user.uid), {
       ...formData,
       email: user.email,
-      profileCompleted: true
+      profileCompleted: true,
+      uid: user.uid
     }, { merge: true });
     if (onClose) onClose();
   };

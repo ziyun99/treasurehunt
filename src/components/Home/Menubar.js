@@ -1,14 +1,36 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { auth } from '../../firebase';
 import { signOut } from 'firebase/auth';
 import DiamondLogsModal from '../modals/DiamondLogsModal';
 import LeaderboardModal from '../modals/LeaderboardModal';
+import { isAdmin } from '../../utils/admin';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default function Menubar({ user, isVertical = false }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showDiamondLogs, setShowDiamondLogs] = useState(false);
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [isAdminUser, setIsAdminUser] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const adminStatus = await isAdmin(user.uid);
+          setIsAdminUser(adminStatus);
+        } catch (error) {
+          console.error('Error checking admin status:', error);
+          setIsAdminUser(false);
+        }
+      } else {
+        setIsAdminUser(false);
+      }
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const handleLogout = async () => {
     try {
@@ -38,6 +60,12 @@ export default function Menubar({ user, isVertical = false }) {
       onClick: () => navigate('/profile'),
       className: 'hover:bg-indigo-100/50'
     },
+    ...(isAdminUser ? [{
+      label: '管理員面板',
+      icon: '⚙️',
+      onClick: () => navigate('/admin'),
+      className: 'hover:bg-indigo-100/50'
+    }] : []),
     {
       label: '登出',
       icon: '🚪',
@@ -62,9 +90,8 @@ export default function Menubar({ user, isVertical = false }) {
         <DiamondLogsModal 
           isOpen={showDiamondLogs}
           onClose={() => setShowDiamondLogs(false)}
-          user={user}
         />
-        <LeaderboardModal 
+        <LeaderboardModal
           isOpen={showLeaderboard}
           onClose={() => setShowLeaderboard(false)}
         />
@@ -87,9 +114,8 @@ export default function Menubar({ user, isVertical = false }) {
       <DiamondLogsModal 
         isOpen={showDiamondLogs}
         onClose={() => setShowDiamondLogs(false)}
-        user={user}
       />
-      <LeaderboardModal 
+      <LeaderboardModal
         isOpen={showLeaderboard}
         onClose={() => setShowLeaderboard(false)}
       />
