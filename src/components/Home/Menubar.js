@@ -1,10 +1,12 @@
-import React from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase';
 import { signOut } from 'firebase/auth';
+import DiamondLogsModal from '../modals/DiamondLogsModal';
 
 export default function Menubar({ user, isVertical = false }) {
   const navigate = useNavigate();
+  const [showDiamondLogs, setShowDiamondLogs] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -15,26 +17,66 @@ export default function Menubar({ user, isVertical = false }) {
     }
   };
 
-  const handleEditProfile = () => {
-    navigate('/profile');
-  };
+  const menuItems = [
+    {
+      label: '查看鑽石記錄',
+      icon: '💎',
+      onClick: () => setShowDiamondLogs(true),
+      className: 'hover:bg-indigo-100/50'
+    },
+    {
+      label: '編輯個人資料',
+      icon: '👤',
+      onClick: () => navigate('/profile'),
+      className: 'hover:bg-indigo-100/50'
+    },
+    {
+      label: '登出',
+      icon: '🚪',
+      onClick: handleLogout,
+      className: 'hover:bg-indigo-100/50'
+    }
+  ];
 
-  if (!user) return null;
+  if (isVertical) {
+    return (
+      <div className="space-y-2">
+        {menuItems.map((item, index) => (
+          <button
+            key={index}
+            onClick={item.onClick}
+            className={`w-full flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 text-gray-700 hover:text-indigo-600 ${item.className}`}
+          >
+            <span className="text-lg">{item.icon}</span>
+            <span className="font-medium">{item.label}</span>
+          </button>
+        ))}
+        <DiamondLogsModal 
+          isOpen={showDiamondLogs}
+          onClose={() => setShowDiamondLogs(false)}
+          user={user}
+        />
+      </div>
+    );
+  }
 
   return (
-    <div className={`${isVertical ? 'flex flex-col space-y-2' : 'flex justify-end space-x-4'}`}>
-      <button
-        onClick={handleEditProfile}
-        className={`${isVertical ? 'w-full' : ''} bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200`}
-      >
-        編輯個人資料
-      </button>
-      <button
-        onClick={handleLogout}
-        className={`${isVertical ? 'w-full' : ''} bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200`}
-      >
-        登出
-      </button>
+    <div className="flex items-center gap-4">
+      {menuItems.map((item, index) => (
+        <button
+          key={index}
+          onClick={item.onClick}
+          className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 text-gray-700 hover:text-indigo-600 ${item.className}`}
+        >
+          <span className="text-lg">{item.icon}</span>
+          <span className="font-medium">{item.label}</span>
+        </button>
+      ))}
+      <DiamondLogsModal 
+        isOpen={showDiamondLogs}
+        onClose={() => setShowDiamondLogs(false)}
+        user={user}
+      />
     </div>
   );
 } 
