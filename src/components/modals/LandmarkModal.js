@@ -48,7 +48,8 @@ export default function LandmarkModal({ user, activeLandmark, progress, onClose,
     const snap = await getDoc(ref);
     if (snap.exists()) {
       const correctPassword = snap.data().keyword;
-      if (passwordInput.trim() === correctPassword) {
+      const correctPassword1 = snap.data().keyword1;
+      if (passwordInput.trim() === correctPassword || passwordInput.trim() === correctPassword1) {
         const userRef = doc(db, "users", user.uid);
         await updateDoc(userRef, {
           [`progress.landmark.${activeLandmark}`]: true
