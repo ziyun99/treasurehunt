@@ -11,81 +11,88 @@ export default function LeaderboardModal({ isOpen, onClose }) {
   const [currentUserRank, setCurrentUserRank] = useState(null);
   const [currentUserData, setCurrentUserData] = useState(null);
   const [peerUsers, setPeerUsers] = useState([]);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const fetchLeaderboard = async () => {
+    try {
+      const currentUser = auth.currentUser;
+      if (!currentUser) return;
+
+      // First, get all users to find current user's rank
+      const allUsersRef = collection(db, "users");
+      const allUsersQuery = query(
+        allUsersRef, 
+        orderBy("diamondPoints", "desc")
+      );
+      const allUsersSnapshot = await getDocs(allUsersQuery);
+      
+      // Process users and handle missing lastDiamondUpdated
+      const allUsers = allUsersSnapshot.docs.map((doc, index) => {
+        const data = doc.data();
+        // If lastDiamondUpdated doesn't exist, use a very large timestamp (year 3000)
+        if (!data.lastDiamondUpdated) {
+          data.lastDiamondUpdated = { 
+            seconds: 32503680000, // January 1, 3000
+            nanoseconds: 0 
+          };
+        }
+        return {
+          id: doc.id,
+          rank: index + 1,
+          ...data
+        };
+      });
+
+      // Sort users by diamondPoints and lastDiamondUpdated in memory
+      allUsers.sort((a, b) => {
+        if (a.diamondPoints !== b.diamondPoints) {
+          return b.diamondPoints - a.diamondPoints;
+        }
+        // For users with same points, earlier timestamp gets higher rank
+        return a.lastDiamondUpdated.seconds - b.lastDiamondUpdated.seconds;
+      });
+
+      // Update ranks after sorting
+      allUsers.forEach((user, index) => {
+        user.rank = index + 1;
+      });
+
+      // Find current user's data
+      const userData = allUsers.find(user => user.id === currentUser.uid);
+      if (userData) {
+        setCurrentUserRank(userData.rank);
+        setCurrentUserData(userData);
+
+        // Get peers around current user (2 above and 2 below)
+        if (userData.rank > 10) {
+          const startIndex = Math.max(0, userData.rank - 3); // -3 to get 2 above
+          const endIndex = Math.min(allUsers.length, userData.rank + 2); // +2 to get 2 below
+          const peers = allUsers.slice(startIndex, endIndex);
+          setPeerUsers(peers);
+        }
+      }
+
+      // Get top 10 users
+      const topUsers = allUsers.slice(0, 10);
+      setUsers(topUsers);
+    } catch (error) {
+      console.error("Error fetching leaderboard:", error);
+    } finally {
+      setIsLoading(false);
+      setIsRefreshing(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchLeaderboard = async () => {
-      try {
-        const currentUser = auth.currentUser;
-        if (!currentUser) return;
-
-        // First, get all users to find current user's rank
-        const allUsersRef = collection(db, "users");
-        const allUsersQuery = query(
-          allUsersRef, 
-          orderBy("diamondPoints", "desc")
-        );
-        const allUsersSnapshot = await getDocs(allUsersQuery);
-        
-        // Process users and handle missing lastDiamondUpdated
-        const allUsers = allUsersSnapshot.docs.map((doc, index) => {
-          const data = doc.data();
-          // If lastDiamondUpdated doesn't exist, use a very large timestamp (year 3000)
-          if (!data.lastDiamondUpdated) {
-            data.lastDiamondUpdated = { 
-              seconds: 32503680000, // January 1, 3000
-              nanoseconds: 0 
-            };
-          }
-          return {
-            id: doc.id,
-            rank: index + 1,
-            ...data
-          };
-        });
-
-        // Sort users by diamondPoints and lastDiamondUpdated in memory
-        allUsers.sort((a, b) => {
-          if (a.diamondPoints !== b.diamondPoints) {
-            return b.diamondPoints - a.diamondPoints;
-          }
-          // For users with same points, earlier timestamp gets higher rank
-          return a.lastDiamondUpdated.seconds - b.lastDiamondUpdated.seconds;
-        });
-
-        // Update ranks after sorting
-        allUsers.forEach((user, index) => {
-          user.rank = index + 1;
-        });
-
-        // Find current user's data
-        const userData = allUsers.find(user => user.id === currentUser.uid);
-        if (userData) {
-          setCurrentUserRank(userData.rank);
-          setCurrentUserData(userData);
-
-          // Get peers around current user (2 above and 2 below)
-          if (userData.rank > 10) {
-            const startIndex = Math.max(0, userData.rank - 3); // -3 to get 2 above
-            const endIndex = Math.min(allUsers.length, userData.rank + 2); // +2 to get 2 below
-            const peers = allUsers.slice(startIndex, endIndex);
-            setPeerUsers(peers);
-          }
-        }
-
-        // Get top 10 users
-        const topUsers = allUsers.slice(0, 10);
-        setUsers(topUsers);
-      } catch (error) {
-        console.error("Error fetching leaderboard:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     if (isOpen) {
       fetchLeaderboard();
     }
   }, [isOpen]);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    fetchLeaderboard();
+  };
 
   if (!isOpen) return null;
 
@@ -205,13 +212,55 @@ export default function LeaderboardModal({ isOpen, onClose }) {
       >
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: '2.5rem', marginBottom: '1.5rem' }}>🏆</div>
-          <h2 style={{ 
-            marginBottom: '1rem', 
-            fontSize: '1.5rem', 
-            fontWeight: 600
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center',
+            gap: '0.5rem',
+            marginBottom: '1rem'
           }}>
-            鑽石排行榜
-          </h2>
+            <h2 style={{ 
+              fontSize: '1.5rem', 
+              fontWeight: 600,
+              margin: 0
+            }}>
+              鑽石排行榜
+            </h2>
+            <button
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              style={{
+                padding: '0.5rem',
+                backgroundColor: 'transparent',
+                border: 'none',
+                borderRadius: '0.5rem',
+                color: 'white',
+                cursor: isRefreshing ? 'not-allowed' : 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'all 0.2s',
+                opacity: isRefreshing ? 0.5 : 1
+              }}
+              className="hover:opacity-80"
+              title="更新排行榜"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                />
+              </svg>
+            </button>
+          </div>
           {currentUserRank && (
             <div style={{ 
               marginBottom: '1rem',
@@ -248,32 +297,23 @@ export default function LeaderboardModal({ isOpen, onClose }) {
                 <div style={{ 
                   fontSize: '0.9rem',
                   color: 'rgba(255, 255, 255, 0.7)',
-                  marginBottom: '0.5rem',
-                  paddingLeft: '0.5rem'
+                  marginBottom: '0.5rem'
                 }}>
-                  前十名
+                  排行榜
                 </div>
-                {users.map((user) => renderUserRow(user, user.id === auth.currentUser?.uid))}
+                {users.map(user => renderUserRow(user, user.id === currentUserData?.id))}
               </div>
               
-              {currentUserData && !isCurrentUserInTop10 && peerUsers.length > 0 && (
-                <div style={{
-                  marginTop: '1rem',
-                  padding: '1rem',
-                  borderTop: '2px dashed rgba(255, 255, 255, 0.2)',
-                  borderBottom: '2px dashed rgba(255, 255, 255, 0.2)',
-                  backgroundColor: 'rgba(255, 255, 255, 0.05)',
-                  borderRadius: '0.5rem'
-                }}>
+              {!isCurrentUserInTop10 && peerUsers.length > 0 && (
+                <div style={{ marginTop: '1rem' }}>
                   <div style={{ 
                     fontSize: '0.9rem',
                     color: 'rgba(255, 255, 255, 0.7)',
-                    marginBottom: '0.5rem',
-                    paddingLeft: '0.5rem'
+                    marginBottom: '0.5rem'
                   }}>
                     你的排名附近
                   </div>
-                  {peerUsers.map((user) => renderUserRow(user, user.id === auth.currentUser?.uid))}
+                  {peerUsers.map(user => renderUserRow(user, user.id === currentUserData?.id))}
                 </div>
               )}
             </>
