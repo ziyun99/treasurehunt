@@ -212,7 +212,7 @@ export default function Home() {
     <div className="min-h-screen bg-yellow-50 relative overflow-hidden">
       {/* Floating Title */}
       <div className="fixed top-4 left-1/2 transform -translate-x-1/2 z-20 w-full max-w-md px-4">
-        <Title countdown={countdown} />
+        <Title countdown={countdown} progress={progress} />
       </div>
 
       {/* Floating Menubar */}
