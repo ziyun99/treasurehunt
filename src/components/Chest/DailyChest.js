@@ -1,24 +1,19 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import BaseChest from './BaseChest';
 import DailyCheckInModal from '../modals/DailyCheckInModal';
-import { updateDiamondPoints } from '../../utils/pointsManager';
 
 export default function DailyChest({ 
   user,
-  diamondPoints,
-  setDiamondPoints,
-  setShowDiamondBonus,
-  setDiamondBonusType
+  handleProgressUpdate
 }) {
   const [showModal, setShowModal] = useState(false);
   const [isCheckedIn, setIsCheckedIn] = useState(false);
 
-  const handleClick = async () => {
+  const checkIfCheckedInToday = async () => {
     if (!user) return;
 
-    // Check if user has already checked in today
     const userRef = doc(db, "users", user.uid);
     const userDoc = await getDoc(userRef);
     const userData = userDoc.data();
@@ -30,8 +25,20 @@ export default function DailyChest({
         lastCheckIn.getMonth() === today.getMonth() &&
         lastCheckIn.getFullYear() === today.getFullYear()) {
       setIsCheckedIn(true);
-      return;
+      return true;
     }
+    return false;
+  };
+
+  useEffect(() => {
+    checkIfCheckedInToday();
+  }, [user]);
+
+  const handleClick = async () => {
+    if (!user) return;
+
+    const isCheckedInToday = await checkIfCheckedInToday();
+    if (isCheckedInToday) return;
 
     setShowModal(true);
   };
@@ -47,14 +54,7 @@ export default function DailyChest({
       }, { merge: true });
 
       // Update points
-      await updateDiamondPoints({
-        user,
-        taskId: 'dailyCheckIn',
-        currentPoints: diamondPoints,
-        setDiamondPoints,
-        setShowDiamondBonus,
-        setDiamondBonusType
-      });
+      handleProgressUpdate("dailyCheckIn");
 
       setIsCheckedIn(true);
       setShowModal(false);

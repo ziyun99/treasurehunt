@@ -1,16 +1,12 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { createPortal } from 'react-dom';
-import { updateDiamondPoints } from '../../utils/pointsManager';
 
 export default function DiamondModal({ 
   isOpen, 
   onClose, 
   onSubmit,
-  diamondPoints,
-  setDiamondPoints,
-  setShowDiamondBonus,
-  setDiamondBonusType
+  handleProgressUpdate
 }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -26,15 +22,7 @@ export default function DiamondModal({
     try {
       const success = await onSubmit(password);
       if (success) {
-        await updateDiamondPoints({
-          taskId: 'diamondChest',
-          currentPoints: diamondPoints,
-          setDiamondPoints,
-          setShowDiamondBonus,
-          setDiamondBonusType,
-          setMessage: () => {},
-          setIsSuccess: () => {}
-        });
+        console.log("diamondChest success");
       } else {
         setError('密碼錯誤，請再試一次');
       }

@@ -5,14 +5,11 @@ import DailyChest from "../Chest/DailyChest";
 import { diamondChestConfig } from "../../config/diamondChestConfig";
 
 export default function ChestOverlay({ 
+  user,
   progress, 
   unlockedIndex, 
   onClickMarker,
-  diamondPoints,
-  setDiamondPoints,
-  setShowDiamondBonus,
-  setDiamondBonusType,
-  user
+  handleProgressUpdate
 }) {
   const [viewportSize, setViewportSize] = useState({
     width: typeof window !== 'undefined' ? window.innerWidth : 800,
@@ -129,16 +126,13 @@ export default function ChestOverlay({
   const getDiamondChestState = (id) => {
     if (id > unlockedIndex) {
       return 'locked';
-    } else if (progress[`diamond_${id}`]) {
+    } else if (progress?.diamond?.[`${id}`]) {
       return 'completed';
     } else {
       return 'open';
     }
   };
 
-  const handleDiamondComplete = async (id) => {
-    progress[`diamond_${id}`] = true;
-  };
 
   return (
     <svg 
@@ -172,10 +166,7 @@ export default function ChestOverlay({
           <div className="w-full h-full overflow-visible">
             <DailyChest 
               user={user}
-              diamondPoints={diamondPoints}
-              setDiamondPoints={setDiamondPoints}
-              setShowDiamondBonus={setShowDiamondBonus}
-              setDiamondBonusType={setDiamondBonusType}
+              handleProgressUpdate={handleProgressUpdate}
             />
           </div>
         </foreignObject>
@@ -233,7 +224,7 @@ export default function ChestOverlay({
           cx={cx}
           cy={cy}
           scale={scale}
-          progress={progress}
+          progress={progress.landmark}
           unlockedIndex={unlockedIndex}
           onClickMarker={onClickMarker}
         />
@@ -273,13 +264,9 @@ export default function ChestOverlay({
                     id={id}
                     position={{ left: 0, top: 0 }}
                     state={state}
-                    onComplete={() => handleDiamondComplete(id)}
                     user={user}
-                    diamondPoints={diamondPoints}
-                    setDiamondPoints={setDiamondPoints}
-                    setShowDiamondBonus={setShowDiamondBonus}
-                    setDiamondBonusType={setDiamondBonusType}
                     image={diamondChestConfig.getImage(id, 'open')}
+                    handleProgressUpdate={handleProgressUpdate}
                   />
                 </div>
               </foreignObject>

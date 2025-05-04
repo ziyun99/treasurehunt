@@ -29,7 +29,7 @@ export default function Home() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isBadgesOpen, setIsBadgesOpen] = useState(false);
   const [showDiamondBonus, setShowDiamondBonus] = useState(false);
-  const [diamondBonusType, setDiamondBonusType] = useState(null);
+  const [diamondBonusTask, setdiamondBonusTask] = useState(null);
   const [viewportSize, setViewportSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight
@@ -66,11 +66,11 @@ export default function Home() {
       if (snap.exists()) {
         const data = snap.data();
         setUserData(data);
-        setProgress(data.progress || {});
+        setProgress(data.progress || {landmark: {}, diamond: {}});
         setDiamondPoints(data.diamondPoints || 0);
         if (!data.profileCompleted) navigate("/profile");
       } else {
-        await setDoc(ref, { progress: {}, diamondPoints: 0 });
+        await setDoc(ref, { progress: {landmark: {}, diamond: {}}, diamondPoints: 0 });
         navigate("/profile");
       }
     });
@@ -165,30 +165,20 @@ export default function Home() {
     setShowAchievement(false);
   };
 
-  const handleProgressUpdate = async (newProgress) => {
-    setProgress(newProgress);
-    // Calculate if a new landmark was just unlocked
-    const oldCompleted = Object.values(progress || {}).filter(Boolean).length;
-    const newCompleted = Object.values(newProgress || {}).filter(Boolean).length;
-    
-    if (newCompleted > oldCompleted) {
-      // Update points using the points manager
-      await updateDiamondPoints({
-        user,
-        taskId: 'landmarkUnlock',
-        currentPoints: diamondPoints,
-        setDiamondPoints,
-        setShowDiamondBonus,
-        setDiamondBonusType
-      });
-      
-      // Update Firebase with new progress
-      if (user) {
-        await setDoc(doc(db, "users", user.uid), { 
-          progress: newProgress
-        }, { merge: true });
-      }
-    }
+  const handleProgressUpdate = async (taskId) => {
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+    setProgress(snap.data().progress);
+
+    // Update points using the points manager
+    await updateDiamondPoints({
+      user,
+      taskId: taskId,
+      currentPoints: diamondPoints,
+      setDiamondPoints,
+      setShowDiamondBonus,
+      setdiamondBonusTask
+    });
   };
 
   const handleModalClose = () => {
@@ -240,7 +230,7 @@ export default function Home() {
           <div className="bg-white/90 backdrop-blur-sm rounded-lg shadow-lg p-3 flex items-center gap-2">
             <span className="text-lg">💎</span>
             <span className="text-lg font-semibold text-indigo-600">
-              +{GAME_RULES.tasks[diamondBonusType === 'landmark' ? 'landmarkUnlock' : 'dailyCheckIn'].points}
+              +{GAME_RULES.tasks[diamondBonusTask].points}
             </span>
           </div>
         </div>
@@ -274,7 +264,7 @@ export default function Home() {
               </div>
             </div>
             <div className={`transition-all duration-200 ease-in-out ${isBadgesOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
-              <Badges progress={progress} />
+              <Badges progress={progress.landmark} />
             </div>
           </div>
         </div>
@@ -355,14 +345,11 @@ export default function Home() {
         {/* Combined Chest Overlay */}
         {isMapAnimationComplete && (
           <ChestOverlay
+            user={user}
             progress={progress}
             unlockedIndex={getUnlockedIndex()}
             onClickMarker={handleLandmarkClick}
-            diamondPoints={diamondPoints}
-            setDiamondPoints={setDiamondPoints}
-            setShowDiamondBonus={setShowDiamondBonus}
-            setDiamondBonusType={setDiamondBonusType}
-            user={user}
+            handleProgressUpdate={handleProgressUpdate}
           />
         )}
       </div>
@@ -370,7 +357,7 @@ export default function Home() {
       <LandmarkModal
         user={user}
         activeLandmark={activeLandmark}
-        progress={progress}
+        progress={progress.landmark}
         onClose={handleModalClose}
         onProgressUpdate={handleProgressUpdate}
       />

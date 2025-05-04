@@ -23,13 +23,9 @@ export default function DiamondChest({
   id, 
   position, 
   state, 
-  onComplete,
   user,
-  diamondPoints,
-  setDiamondPoints,
-  setShowDiamondBonus,
-  setDiamondBonusType,
-  image
+  image,
+  handleProgressUpdate
 }) {
   const [showDiamondModal, setShowDiamondModal] = useState(false);
   const [password, setPassword] = useState(null);
@@ -70,13 +66,11 @@ export default function DiamondChest({
         // Update user's diamond progress in Firestore
         const userRef = doc(db, "users", user.uid);
         await updateDoc(userRef, {
-          [`progress.diamond_progress.${id}`]: true
+          [`progress.diamond.${id}`]: true
         });
-
+        handleProgressUpdate("diamondChest");
+        console.log("handleProgressUpdate diamondChest");
         setShowDiamondModal(false);
-        if (onComplete) {
-          await onComplete();
-        }
         return true;
       } catch (error) {
         console.error("Error updating diamond progress:", error);
@@ -103,10 +97,6 @@ export default function DiamondChest({
         isOpen={showDiamondModal}
         onClose={() => setShowDiamondModal(false)}
         onSubmit={handlePasswordSubmit}
-        diamondPoints={diamondPoints}
-        setDiamondPoints={setDiamondPoints}
-        setShowDiamondBonus={setShowDiamondBonus}
-        setDiamondBonusType={setDiamondBonusType}
       />
     </>
   );

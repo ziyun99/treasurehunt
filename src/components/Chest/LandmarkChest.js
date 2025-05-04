@@ -48,7 +48,7 @@ export default function LandmarkChest({
   const getState = () => {
     if (id > unlockedIndex) {
       return 'locked';
-    } else if (progress[id]) {
+    } else if (progress?.[id]) {
       return 'completed';
     } else {
       return 'open';
@@ -56,7 +56,7 @@ export default function LandmarkChest({
   };
 
   const handleClick = () => {
-    if (progress[id]) return;
+    if (progress?.[id]) return;
     onClickMarker(id);
   };
 

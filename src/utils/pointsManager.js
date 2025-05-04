@@ -8,7 +8,7 @@ export const updateDiamondPoints = async ({
   currentPoints,
   setDiamondPoints,
   setShowDiamondBonus,
-  setDiamondBonusType,
+  setdiamondBonusTask,
   setMessage,
   setIsSuccess
 }) => {
@@ -25,7 +25,7 @@ export const updateDiamondPoints = async ({
 
   // Update local state
   setDiamondPoints(newPoints);
-  setDiamondBonusType(task.type);
+  setdiamondBonusTask(taskId);
   setShowDiamondBonus(true);
   setTimeout(() => setShowDiamondBonus(false), 2000);
 

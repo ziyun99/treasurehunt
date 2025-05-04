@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import Confetti from "react-confetti";
 import { GAME_RULES } from "../../config/gameRules";
@@ -49,12 +49,14 @@ export default function LandmarkModal({ user, activeLandmark, progress, onClose,
     if (snap.exists()) {
       const correctPassword = snap.data().keyword;
       if (passwordInput.trim() === correctPassword) {
-        const newProgress = { ...progress, [activeLandmark]: true };
-        onProgressUpdate(newProgress);
-        await setDoc(doc(db, "users", user.uid), { progress: newProgress }, { merge: true });
-        
+        const userRef = doc(db, "users", user.uid);
+        await updateDoc(userRef, {
+          [`progress.landmark.${activeLandmark}`]: true
+        });
+        onProgressUpdate("landmarkUnlock");
+
         // Check if this is the first unlock
-        const firstUnlock = !progress[activeLandmark];
+        const firstUnlock = !progress?.[activeLandmark];
         setIsFirstUnlock(firstUnlock);
         
         const successMessage = firstUnlock 

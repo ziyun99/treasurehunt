@@ -6,6 +6,12 @@ export const GAME_RULES = {
       message: (points) => `✅ 通關成功！\n💎 +${points} 鑽石`,
       type: 'landmark'
     },
+    diamondChest: {
+      id: 'diamondChest',
+      points: 20,
+      message: (points) => `✅ 鑽石寶箱解鎖成功！\n💎 +${points} 鑽石`,
+      type: 'diamond'
+    },
     dailyCheckIn: {
       id: 'dailyCheckIn',
       points: 5,
