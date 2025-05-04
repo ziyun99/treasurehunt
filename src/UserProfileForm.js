@@ -10,28 +10,74 @@ export default function UserProfileForm({ onClose }) {
   const [copied, setCopied] = useState(false);
 
   const locations = [
-    "台北市",
-    "新北市",
-    "桃園市",
-    "台中市",
-    "台南市",
-    "高雄市",
-    "基隆市",
-    "新竹市",
-    "新竹縣",
-    "苗栗縣",
-    "彰化縣",
-    "南投縣",
-    "雲林縣",
-    "嘉義市",
-    "嘉義縣",
-    "屏東縣",
-    "宜蘭縣",
-    "花蓮縣",
-    "台東縣",
-    "澎湖縣",
-    "金門縣",
-    "連江縣"
+    "台灣-北北基",
+    "台灣-桃竹苗",
+    "台灣-中彰投雲",
+    "台灣-嘉南",
+    "台灣-高屏",
+    "台灣-宜花東",
+    "馬來西亞-北馬",
+    "馬來西亞-中馬",
+    "馬來西亞-南馬",
+    "馬來西亞-東馬",
+    "新加坡",
+    "中國大陸",
+    "香港",
+    "美國",
+    "英國",
+    "法國",
+    "越南",
+    "南非",
+    "澳洲",
+    "其他"
+  ];
+
+  const helpers = [
+    "台灣 01 雅瓶",
+    "台灣 02 雅婷",
+    "台灣 03 媖婕",
+    "台灣 04 佳津",
+    "台灣 05 若渝",
+    "台灣 06 彩煌",
+    "台灣 07 佳蓁",
+    "台灣 08 麗珠",
+    "台灣 09 玉純",
+    "台灣 10 妤馨",
+    "台灣 11 建良+瑞玲",
+    "台灣 12 育驊",
+    "台灣 13 庭雯",
+    "台灣 14 淑貞+茉宸",
+    "台灣 16 彩煌",
+    "台灣 17 雅瓶",
+    "台灣 18 麗珠+湘涵",
+    "台灣 19 玉純",
+    "台灣 20 媖婕",
+    "台灣 21 育驊",
+    "台灣 22 妤馨",
+    "國際群組 15 Amy",
+    "大馬 01 冰莹",
+    "大馬 02 澄俊",
+    "大馬 03 麗麗",
+    "新加坡 04 艾鴒",
+    "大馬 05 美清",
+    "大馬 06 Isa",
+    "大馬 07 美萍",
+    "大馬 08 函澒",
+    "新加坡 09 慧菁",
+    "綜合 10 魏美玲",
+    "大馬 11 媺思",
+    "大馬 12 Eva",
+    "大馬 13 淑君+文祥",
+    "大馬 14 淑麗",
+    "大馬 15 Rachel",
+    "大馬 16 承沿玉莉",
+    "綜合 17 魏美玲",
+    "大馬 18 Isa",
+    "大馬 19 Rachel",
+    "大馬 20 澄俊",
+    "大馬 21 麗麗",
+    "香港內地 00 小敏+錢慧",
+    "其它"
   ];
 
   useEffect(() => {
@@ -61,6 +107,7 @@ export default function UserProfileForm({ onClose }) {
     if (!user) return;
     await setDoc(doc(db, "users", user.uid), {
       ...formData,
+      email: user.email,
       profileCompleted: true
     }, { merge: true });
     if (onClose) onClose();
@@ -150,10 +197,11 @@ export default function UserProfileForm({ onClose }) {
             required
           >
             <option value="">請選擇</option>
-            <option value="A">小幫手 A</option>
-            <option value="B">小幫手 B</option>
-            <option value="C">小幫手 C</option>
-            <option value="D">小幫手 D</option>
+            {helpers.map((helper) => (
+              <option key={helper} value={helper}>
+                {helper}
+              </option>
+            ))}
           </select>
         </div>
         <button
