@@ -90,6 +90,7 @@ export default function Menubar({ user, isVertical = false }) {
         <DiamondLogsModal 
           isOpen={showDiamondLogs}
           onClose={() => setShowDiamondLogs(false)}
+          user={user}
         />
         <LeaderboardModal
           isOpen={showLeaderboard}
@@ -114,6 +115,7 @@ export default function Menubar({ user, isVertical = false }) {
       <DiamondLogsModal 
         isOpen={showDiamondLogs}
         onClose={() => setShowDiamondLogs(false)}
+        user={user}
       />
       <LeaderboardModal
         isOpen={showLeaderboard}
