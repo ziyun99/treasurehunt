@@ -92,6 +92,7 @@ export default function QuoteModal({ isOpen, onClose, quotes = [], type = 'defau
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.9, opacity: 0 }}
         transition={{ type: 'spring', damping: 20 }}
+        onClick={showNextButton ? handleNextQuote : undefined}
         style={{
           position: 'relative',
           width: '90%',
@@ -100,7 +101,8 @@ export default function QuoteModal({ isOpen, onClose, quotes = [], type = 'defau
           borderRadius: '1.5rem',
           background: getGradientStyle(),
           color: 'white',
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          cursor: showNextButton ? 'pointer' : 'default'
         }}
       >
         <div style={{ 
@@ -137,7 +139,7 @@ export default function QuoteModal({ isOpen, onClose, quotes = [], type = 'defau
                     textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
                   }}
                 >
-                  Hi {userName}! 今日您已簽到咯～
+                  Hi {userName}! 您今日已簽到咯～
                 </motion.p>
               )}
             </>
@@ -202,7 +204,8 @@ export default function QuoteModal({ isOpen, onClose, quotes = [], type = 'defau
             transition: 'color 0.2s',
             background: 'none',
             border: 'none',
-            cursor: 'pointer'
+            cursor: 'pointer',
+            zIndex: 1
           }}
           onMouseOver={e => e.currentTarget.style.color = 'white'}
           onMouseOut={e => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'}
@@ -211,34 +214,6 @@ export default function QuoteModal({ isOpen, onClose, quotes = [], type = 'defau
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </motion.button>
-        {showNextButton && (
-          <motion.button
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={handleNextQuote}
-            style={{
-              position: 'absolute',
-              bottom: '1rem',
-              right: '1rem',
-              padding: '0.75rem',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              color: 'white',
-              borderRadius: '0.75rem',
-              border: 'none',
-              cursor: 'pointer',
-              transition: 'background-color 0.2s',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-            onMouseOver={e => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
-            onMouseOut={e => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </motion.button>
-        )}
       </motion.div>
     </motion.div>,
     document.body

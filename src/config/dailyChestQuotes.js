@@ -61,7 +61,7 @@ export const dailyChestQuotes = {
     
     // If no date-specific quote, fall back to day of week
     const dayOfWeek = today.getDay();
-    return dailyChestQuotes.dayQuotes[dayOfWeek];
+    return {}  // return dailyChestQuotes.dayQuotes[dayOfWeek];
   },
 
   // Helper function to get the quote for a specific date
