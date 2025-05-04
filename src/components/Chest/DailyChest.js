@@ -86,7 +86,7 @@ export default function DailyChest({
         size={80}
         onClick={handleClick}
         showHoverShadow={!isCheckedIn}
-        customIcon={isCheckedIn ? '/icons/chest-blue-light.svg' : '/icons/chest-blue.svg'}
+        customIcon={isCheckedIn ? '/icons/chest-blue-light.gif' : '/icons/chest-blue.svg'}
         quotes={[dailyChestQuotes.getTodayQuote()]}
         userName={userName}
       />

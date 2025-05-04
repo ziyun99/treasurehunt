@@ -50,7 +50,7 @@ export default function QuoteModal({ isOpen, onClose, quotes = [], type = 'defau
       case 'diamond':
         return 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))';
       case 'daily':
-        return 'linear-gradient(135deg, rgba(255, 200, 0, 0.9), rgba(255, 150, 0, 0.9))';
+        return 'radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.95) 0%, rgba(255, 200, 0, 0.95) 30%, rgba(255, 150, 0, 0.95) 60%, rgba(255, 100, 0, 0.95) 100%)';
       default:
         return 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))';
     }

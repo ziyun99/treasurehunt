@@ -56,25 +56,33 @@ export default function DiamondModal({
           width: '90%',
           maxWidth: '500px',
           padding: '2rem',
-          borderRadius: '1rem',
-          background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.9), rgba(168, 85, 247, 0.9))',
+          borderRadius: '1.5rem',
+          background: 'linear-gradient(135deg, rgba(147, 51, 234, 0.95), rgba(79, 70, 229, 0.95))',
           color: 'white',
-          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)'
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(8px)'
         }}
       >
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: '1.5rem' }}>💎</div>
+          <div style={{ 
+            fontSize: '3rem', 
+            marginBottom: '1.5rem',
+            textShadow: '0 0 20px rgba(255, 255, 255, 0.5)'
+          }}>💎</div>
           <h2 style={{ 
             marginBottom: '1rem', 
-            fontSize: '1.5rem', 
-            fontWeight: 600
+            fontSize: '1.75rem', 
+            fontWeight: 700,
+            textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
           }}>
             鑽石寶箱
           </h2>
           <p style={{ 
             marginBottom: '1.5rem', 
-            fontSize: '1rem', 
-            opacity: 0.8
+            fontSize: '1.1rem', 
+            opacity: 0.9,
+            textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'
           }}>
             輸入密碼來開啟寶箱
           </p>
@@ -85,13 +93,15 @@ export default function DiamondModal({
               onChange={(e) => setPassword(e.target.value)}
               style={{
                 width: '100%',
-                padding: '0.75rem 1rem',
-                borderRadius: '0.5rem',
-                border: 'none',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                padding: '0.875rem 1.25rem',
+                borderRadius: '0.75rem',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                backgroundColor: 'rgba(255, 255, 255, 0.15)',
                 color: 'white',
-                fontSize: '1rem',
-                marginBottom: '1rem'
+                fontSize: '1.1rem',
+                marginBottom: '1rem',
+                transition: 'all 0.2s',
+                outline: 'none'
               }}
               placeholder="輸入密碼"
               disabled={isSubmitting}
@@ -100,7 +110,8 @@ export default function DiamondModal({
               <p style={{ 
                 color: '#ff6b6b', 
                 marginBottom: '1rem',
-                fontSize: '0.875rem'
+                fontSize: '0.875rem',
+                textShadow: '0 1px 2px rgba(0, 0, 0, 0.1)'
               }}>
                 {error}
               </p>
@@ -110,15 +121,17 @@ export default function DiamondModal({
               disabled={isSubmitting}
               style={{
                 width: '100%',
-                padding: '0.75rem 2rem',
-                borderRadius: '0.5rem',
-                background: 'white',
-                color: 'rgba(99, 102, 241, 0.9)',
+                padding: '0.875rem 2rem',
+                borderRadius: '0.75rem',
+                background: 'rgba(255, 255, 255, 0.95)',
+                color: 'rgba(79, 70, 229, 0.95)',
                 fontWeight: 600,
-                fontSize: '1rem',
+                fontSize: '1.1rem',
                 transition: 'all 0.2s',
                 cursor: isSubmitting ? 'not-allowed' : 'pointer',
-                opacity: isSubmitting ? 0.7 : 1
+                opacity: isSubmitting ? 0.7 : 1,
+                border: 'none',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
               }}
             >
               {isSubmitting ? '開啟中...' : '開啟寶箱'}
@@ -129,11 +142,13 @@ export default function DiamondModal({
           onClick={onClose}
           style={{
             position: 'absolute',
-            top: '1rem',
-            right: '1rem',
+            top: '1.25rem',
+            right: '1.25rem',
             padding: '0.5rem',
             color: 'rgba(255, 255, 255, 0.7)',
-            transition: 'color 0.2s'
+            transition: 'all 0.2s',
+            borderRadius: '0.5rem',
+            backgroundColor: 'rgba(255, 255, 255, 0.1)'
           }}
           onMouseOver={e => e.currentTarget.style.color = 'white'}
           onMouseOut={e => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'}

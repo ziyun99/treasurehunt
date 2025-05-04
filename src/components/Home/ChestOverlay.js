@@ -154,13 +154,13 @@ export default function ChestOverlay({
       }, ${
         isPortrait
           ? landmarks[0]?.cy - 0
-          : landmarks[0]?.cy - (viewportSize.height/5)
+          : landmarks[0]?.cy - (viewportSize.height/4)
       })`}>
         <foreignObject 
           x={-40 * scale} 
           y={-40 * scale} 
-          width={80 * scale} 
-          height={80 * scale}
+          width={120 * scale} 
+          height={120 * scale}
           overflow="visible"
         >
           <div className="w-full h-full overflow-visible">
