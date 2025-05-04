@@ -18,9 +18,9 @@ export default function MusicPlayer() {
     return savedState ? JSON.parse(savedState) : true;
   });
   const [currentMusic, setCurrentMusic] = useState(() => {
-    // Initialize from localStorage or default to first song
+    // Initialize from localStorage or default to 黃金娃娃ing
     const savedMusic = localStorage.getItem('currentMusic');
-    return savedMusic ? JSON.parse(savedMusic) : MUSIC_FILES[0];
+    return savedMusic ? JSON.parse(savedMusic) : MUSIC_FILES.find(m => m.name === '黃金娃娃ing');
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showPlaylist, setShowPlaylist] = useState(false);
@@ -77,6 +77,8 @@ export default function MusicPlayer() {
     const audio = audioRef.current;
     if (audio) {
       if (isPlaying) {
+        // Add autoplay attribute
+        audio.autoplay = true;
         const playPromise = audio.play();
         if (playPromise !== undefined) {
           playPromise
@@ -85,7 +87,10 @@ export default function MusicPlayer() {
             })
             .catch(error => {
               console.error("Error playing audio:", error);
-              setIsPlaying(false);
+              // Try to play again after a short delay
+              setTimeout(() => {
+                audio.play().catch(e => console.error("Second attempt failed:", e));
+              }, 1000);
             });
         }
       } else {
