@@ -12,6 +12,7 @@ import ChestOverlay from "./components/Home/ChestOverlay";
 import MusicPlayer from "./components/Home/MusicPlayer";
 import { GAME_RULES } from "./config/gameRules";
 import { updateDiamondPoints } from "./utils/pointsManager";
+import DiamondLogsModal from "./components/modals/DiamondLogsModal";
 
 const START_DATE = new Date("2025-04-24T00:00:00");
 
@@ -40,6 +41,7 @@ export default function Home() {
   const audioContextRef = useRef(null);
   const hasPlayedSoundRef = useRef(false);
   const navigate = useNavigate();
+  const [showDiamondLogs, setShowDiamondLogs] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -168,8 +170,11 @@ export default function Home() {
   const handleProgressUpdate = async (taskName, taskId) => {
     const ref = doc(db, "users", user.uid);
     const snap = await getDoc(ref);
-    setProgress(snap.data().progress);
+    const userData = snap.data();
+    const currentProgress = userData?.progress || { landmark: {}, diamond: {} };
+    setProgress(currentProgress);
 
+    console.log("handleProgressUpdate:setProgress", taskName, taskId);
     // Update points using the points manager
     const newPoints = await updateDiamondPoints({
       user,
@@ -182,12 +187,18 @@ export default function Home() {
 
     // Add diamond log entry
     const diamondLogRef = doc(db, "users", user.uid, "diamond_logs", Date.now().toString());
-    await setDoc(diamondLogRef, {
+    const logData = {
       timestamp: new Date(),
       task: GAME_RULES.tasks[taskName].id,
-      task_id: taskId,
       points: GAME_RULES.tasks[taskName].points
-    });
+    };
+    
+    // Only add task_id if it's provided
+    if (taskId) {
+      logData.task_id = taskId;
+    }
+    
+    await setDoc(diamondLogRef, logData);
   };
 
   const handleModalClose = () => {
@@ -266,14 +277,22 @@ export default function Home() {
                 </svg>
               </div>
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 bg-indigo-50/50 px-1.5 py-0.5 rounded-full border border-indigo-100 relative overflow-hidden">
+                <div className="flex items-center gap-1 bg-indigo-50/50 px-1.5 py-0.5 rounded-full border border-indigo-100 relative overflow-hidden cursor-pointer hover:bg-indigo-50/70 transition-colors duration-200"
+                     onClick={(e) => {
+                       e.stopPropagation();
+                       setShowDiamondLogs(true);
+                     }}>
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-indigo-100/50 to-transparent animate-shine" style={{ animationDelay: `${Math.random() * 5}s` }} />
                   <span className="text-xs sm:text-sm font-semibold text-indigo-600 relative">💎 {diamondPoints}</span>
                 </div>
               </div>
             </div>
             <div className={`transition-all duration-200 ease-in-out ${isBadgesOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
-              <Badges progress={progress.landmark} />
+              <Badges 
+                progress={progress.landmark} 
+                user={user}
+                diamondPoints={diamondPoints}
+              />
             </div>
           </div>
         </div>
@@ -374,6 +393,12 @@ export default function Home() {
       {showAchievement && (
         <AchievementNotification earned={earned} prevEarned={prevEarned} />
       )}
+
+      <DiamondLogsModal 
+        isOpen={showDiamondLogs}
+        onClose={() => setShowDiamondLogs(false)}
+        user={user}
+      />
     </div>
   );
 }
