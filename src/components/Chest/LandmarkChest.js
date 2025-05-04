@@ -45,7 +45,7 @@ export default function LandmarkChest({
       case 'open':
         return `${process.env.PUBLIC_URL}/icons/chest-closed.svg`;
       case 'completed':
-        return `${process.env.PUBLIC_URL}/icons/chest-open.svg`;
+        return `${process.env.PUBLIC_URL}/icons/chest-open.gif`;
       default:
         return `${process.env.PUBLIC_URL}/icons/chest-closed.svg`;
     }

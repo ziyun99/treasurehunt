@@ -86,7 +86,7 @@ export default function DiamondLogsModal({ isOpen, onClose, user }) {
             fontSize: '1.5rem', 
             fontWeight: 600
           }}>
-            鑽石記錄
+            我的鑽石記錄
           </h2>
         </div>
 

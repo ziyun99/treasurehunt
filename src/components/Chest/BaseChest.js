@@ -43,7 +43,7 @@ export default function BaseChest({
       case 'open':
         return '/icons/chest-closed.svg';
       case 'completed':
-        return '/icons/chest-open.svg';
+        return '/icons/chest-open.gif';
       default:
         return '/icons/chest-closed.svg';
     }
