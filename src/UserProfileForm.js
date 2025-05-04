@@ -5,7 +5,14 @@ import { db } from "./firebase";
 
 export default function UserProfileForm({ onClose }) {
   const user = getAuth().currentUser;
-  const [formData, setFormData] = useState({ name: "", location: "", helper: "" });
+  const [formData, setFormData] = useState({ 
+    name: "", 
+    location: "", 
+    helper: "",
+    secretCodeYear: "",
+    phoneNumber: "",
+    countryCode: "+886" // Default to Taiwan
+  });
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
 
@@ -80,6 +87,82 @@ export default function UserProfileForm({ onClose }) {
     "其它"
   ];
 
+  const secretCodeYears = [
+    "2014",
+    "2015",
+    "2016",
+    "2017",
+    "2018",
+    "2019",
+    "2020",
+    "2021",
+    "2022",
+    "2023",
+    "2024",
+    "2025"
+  ];
+
+  const countryCodes = [
+    { code: "+886", country: "台灣" },
+    { code: "+60", country: "馬來西亞" },
+    { code: "+65", country: "新加坡" },
+    { code: "+86", country: "中國" },
+    { code: "+852", country: "香港" },
+    { code: "+853", country: "澳門" },
+    { code: "+81", country: "日本" },
+    { code: "+82", country: "韓國" },
+    { code: "+63", country: "菲律賓" },
+    { code: "+66", country: "泰國" },
+    { code: "+62", country: "印尼" },
+    { code: "+84", country: "越南" },
+    { code: "+95", country: "緬甸" },
+    { code: "+855", country: "柬埔寨" },
+    { code: "+856", country: "寮國" },
+    { code: "+673", country: "汶萊" },
+    { code: "+91", country: "印度" },
+    { code: "+880", country: "孟加拉" },
+    { code: "+94", country: "斯里蘭卡" },
+    { code: "+1", country: "美國/加拿大" },
+    { code: "+44", country: "英國" },
+    { code: "+33", country: "法國" },
+    { code: "+49", country: "德國" },
+    { code: "+39", country: "義大利" },
+    { code: "+34", country: "西班牙" },
+    { code: "+31", country: "荷蘭" },
+    { code: "+32", country: "比利時" },
+    { code: "+41", country: "瑞士" },
+    { code: "+43", country: "奧地利" },
+    { code: "+46", country: "瑞典" },
+    { code: "+47", country: "挪威" },
+    { code: "+45", country: "丹麥" },
+    { code: "+358", country: "芬蘭" },
+    { code: "+353", country: "愛爾蘭" },
+    { code: "+61", country: "澳洲" },
+    { code: "+64", country: "紐西蘭" },
+    { code: "+27", country: "南非" },
+    { code: "+20", country: "埃及" },
+    { code: "+971", country: "阿拉伯聯合大公國" },
+    { code: "+966", country: "沙烏地阿拉伯" },
+    { code: "+974", country: "卡達" },
+    { code: "+968", country: "阿曼" },
+    { code: "+965", country: "科威特" },
+    { code: "+962", country: "約旦" },
+    { code: "+972", country: "以色列" },
+    { code: "+90", country: "土耳其" },
+    { code: "+7", country: "俄羅斯" },
+    { code: "+380", country: "烏克蘭" },
+    { code: "+48", country: "波蘭" },
+    { code: "+420", country: "捷克" },
+    { code: "+36", country: "匈牙利" },
+    { code: "+40", country: "羅馬尼亞" },
+    { code: "+55", country: "巴西" },
+    { code: "+52", country: "墨西哥" },
+    { code: "+54", country: "阿根廷" },
+    { code: "+56", country: "智利" },
+    { code: "+51", country: "秘魯" },
+    { code: "+57", country: "哥倫比亞" }
+  ];
+
   useEffect(() => {
     const loadProfile = async () => {
       if (!user) return;
@@ -90,7 +173,10 @@ export default function UserProfileForm({ onClose }) {
         setFormData({
           name: data.name || "",
           location: data.location || "",
-          helper: data.helper || ""
+          helper: data.helper || "",
+          secretCodeYear: data.secretCodeYear || "",
+          phoneNumber: data.phoneNumber || "",
+          countryCode: data.countryCode || "+886"
         });
       }
       setLoading(false);
@@ -172,6 +258,32 @@ export default function UserProfileForm({ onClose }) {
           />
         </div>
         <div>
+          <label className="block font-medium mb-1">手機號碼</label>
+          <div className="flex gap-2">
+            <select
+              name="countryCode"
+              value={formData.countryCode}
+              onChange={handleChange}
+              className="border rounded px-3 py-2 w-32"
+            >
+              {countryCodes.map(({ code, country }) => (
+                <option key={code} value={code}>
+                  {code} {country}
+                </option>
+              ))}
+            </select>
+            <input
+              type="tel"
+              name="phoneNumber"
+              value={formData.phoneNumber}
+              onChange={handleChange}
+              className="flex-1 border rounded px-3 py-2"
+              placeholder="請輸入手機號碼"
+              required
+            />
+          </div>
+        </div>
+        <div>
           <label className="block font-medium mb-1">所在地區</label>
           <select
             name="location"
@@ -201,6 +313,23 @@ export default function UserProfileForm({ onClose }) {
             {helpers.map((helper) => (
               <option key={helper} value={helper}>
                 {helper}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block font-medium mb-1">请问您是在哪一年开始學習《超级生命密码》？</label>
+          <select
+            name="secretCodeYear"
+            value={formData.secretCodeYear}
+            onChange={handleChange}
+            className="w-full border rounded px-3 py-2"
+            required
+          >
+            <option value="">請選擇年份</option>
+            {secretCodeYears.map((year) => (
+              <option key={year} value={year}>
+                {year}
               </option>
             ))}
           </select>

@@ -655,6 +655,8 @@ export default function Admin() {
                         { field: 'email', label: 'Email' },
                         { field: 'location', label: '地區' },
                         { field: 'helper', label: '小幫手' },
+                        { field: 'phoneNumber', label: '手機號碼' },
+                        { field: 'secretCodeYear', label: '學習年份' },
                         { field: 'diamondPoints', label: '鑽石點數' },
                         { field: 'progress', label: '進度' },
                         { field: 'lastCheckIn', label: '最後簽到' },
@@ -685,6 +687,10 @@ export default function Admin() {
                         <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 break-all">{user.email || '-'}</td>
                         <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.location || '-'}</td>
                         <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.helper || '-'}</td>
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          {user.countryCode && user.phoneNumber ? `${user.countryCode} ${user.phoneNumber}` : '-'}
+                        </td>
+                        <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.secretCodeYear || '-'}</td>
                         <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.diamondPoints || 0}</td>
                         <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatProgress(user.progress)}</td>
                         <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">{formatDate(user.lastCheckIn)}</td>
