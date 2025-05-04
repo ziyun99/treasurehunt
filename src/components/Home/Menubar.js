@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase';
 import { signOut } from 'firebase/auth';
 import DiamondLogsModal from '../modals/DiamondLogsModal';
+import LeaderboardModal from '../modals/LeaderboardModal';
 
 export default function Menubar({ user, isVertical = false }) {
   const navigate = useNavigate();
   const [showDiamondLogs, setShowDiamondLogs] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   const handleLogout = async () => {
     try {
@@ -18,6 +20,12 @@ export default function Menubar({ user, isVertical = false }) {
   };
 
   const menuItems = [
+    {
+      label: '鑽石排行榜',
+      icon: '🏆',
+      onClick: () => setShowLeaderboard(true),
+      className: 'hover:bg-indigo-100/50'
+    },
     {
       label: '查看鑽石記錄',
       icon: '💎',
@@ -56,6 +64,10 @@ export default function Menubar({ user, isVertical = false }) {
           onClose={() => setShowDiamondLogs(false)}
           user={user}
         />
+        <LeaderboardModal 
+          isOpen={showLeaderboard}
+          onClose={() => setShowLeaderboard(false)}
+        />
       </div>
     );
   }
@@ -76,6 +88,10 @@ export default function Menubar({ user, isVertical = false }) {
         isOpen={showDiamondLogs}
         onClose={() => setShowDiamondLogs(false)}
         user={user}
+      />
+      <LeaderboardModal 
+        isOpen={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
       />
     </div>
   );

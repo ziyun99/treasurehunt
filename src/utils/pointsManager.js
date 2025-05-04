@@ -1,4 +1,4 @@
-import { doc, updateDoc } from "firebase/firestore";
+import { doc, updateDoc, Timestamp } from "firebase/firestore";
 import { db } from "../firebase";
 import { GAME_RULES } from "../config/gameRules";
 
@@ -20,7 +20,8 @@ export const updateDiamondPoints = async ({
   // Update Firebase
   const userRef = doc(db, "users", user.uid);
   await updateDoc(userRef, {
-    diamondPoints: newPoints
+    diamondPoints: newPoints,
+    lastDiamondUpdated: Timestamp.now()
   });
 
   // Update local state

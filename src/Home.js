@@ -192,12 +192,10 @@ export default function Home() {
       task: GAME_RULES.tasks[taskName].id,
       points: GAME_RULES.tasks[taskName].points
     };
-    
     // Only add task_id if it's provided
     if (taskId) {
       logData.task_id = taskId;
     }
-    
     await setDoc(diamondLogRef, logData);
   };
 
