@@ -16,8 +16,8 @@ export const diamondChestConfig = {
     // Third diamond chest images
     diamond3: {
       locked: `${process.env.PUBLIC_URL}/icons/diamond.svg`,
-      open: `${process.env.PUBLIC_URL}/icons/diamond.svg`,
-      completed: `${process.env.PUBLIC_URL}/icons/diamond-light.svg`
+      open: `${process.env.PUBLIC_URL}/icons/diamond3.svg`,
+      completed: `${process.env.PUBLIC_URL}/icons/diamond3-light.svg`
     }
   },
 
@@ -38,13 +38,13 @@ export const diamondChestConfig = {
     landscape: [
       { x: 0.15, y: -0.3 },    // First diamond chest offset
       { x: 0.4, y: 0.2 },      // Second diamond chest offset
-      { x: 0.6, y: -0.1 }      // Third diamond chest offset
+      { x: 0.6, y: 0.05 }      // Third diamond chest offset
     ]
   },
 
   // Size configurations
   size: {
-    icon: 40,  // Base size for the icon
+    icon: 50,  // Base size for the icon
     text: 13   // Base size for the text
   },
 

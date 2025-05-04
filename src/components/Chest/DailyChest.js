@@ -11,6 +11,19 @@ export default function DailyChest({
 }) {
   const [showModal, setShowModal] = useState(false);
   const [isCheckedIn, setIsCheckedIn] = useState(false);
+  const [userName, setUserName] = useState('');
+
+  useEffect(() => {
+    const fetchUserName = async () => {
+      if (!user) return;
+      const userRef = doc(db, "users", user.uid);
+      const userDoc = await getDoc(userRef);
+      if (userDoc.exists()) {
+        setUserName(userDoc.data().name || '');
+      }
+    };
+    fetchUserName();
+  }, [user]);
 
   const checkIfCheckedInToday = async () => {
     if (!user) return;
@@ -75,6 +88,7 @@ export default function DailyChest({
         showHoverShadow={!isCheckedIn}
         customIcon={isCheckedIn ? '/icons/chest-blue-light.svg' : '/icons/chest-blue.svg'}
         quotes={[dailyChestQuotes.getTodayQuote()]}
+        userName={userName}
       />
       <DailyCheckInModal
         isOpen={showModal}

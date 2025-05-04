@@ -19,35 +19,36 @@ export const dailyChestQuotes = {
   // Default quotes for each day of the week (0 = Sunday, 1 = Monday, ..., 6 = Saturday)
   dayQuotes: [
     {
-      text: "週日的寧靜，是為了迎接新的一週的挑戰。",
-      author: "週日守護者"
+      text: "感恩過去一週的收穫，期待新一週的成長。",
+      author: ""
     },
     {
-      text: "週一的開始，是新的機會與希望。",
-      author: "週一導師"
+      text: "新的一週開始了！讓我們帶著好奇心和熱情，探索知識的海洋。",
+      author: ""
     },
     {
       text: "週二的堅持，是通往成功的階梯。",
-      author: "週二智者"
+      author: ""
     },
     {
-      text: "週三的平衡，是生活與學習的藝術。",
-      author: "週三平衡者"
+      text: "知識就像陽光，照亮我們前進的道路。",
+      author: ""
     },
     {
       text: "週四的突破，是超越自我的時刻。",
-      author: "週四突破者"
+      author: ""
     },
     {
       text: "週五的收穫，是努力的回報。",
-      author: "週五收穫者"
+      author: ""
     },
     {
-      text: "週六的放鬆，是為了更好的開始。",
-      author: "週六守護者"
+      text: "保持樂觀的心態，世界會因你而更美好。",
+      author: ""
     }
   ],
 
+  
   // Helper function to get the quote for today
   getTodayQuote: () => {
     const today = new Date();
@@ -75,5 +76,13 @@ export const dailyChestQuotes = {
     // If no date-specific quote, fall back to day of week
     const dayOfWeek = date.getDay();
     return dailyChestQuotes.dayQuotes[dayOfWeek];
+  },
+
+  // Helper function to get the sun sticker for today
+  getTodaySunSticker: () => {
+    const dayOfWeek = new Date().getDay(); // 0 = Sunday, 1 = Monday, ..., 6 = Saturday
+    // Convert to 1-7 (Monday = 1, ..., Sunday = 7)
+    const stickerNumber = dayOfWeek === 0 ? 7 : dayOfWeek;
+    return `/icons/sunny/${stickerNumber}.svg`;
   }
 }; 

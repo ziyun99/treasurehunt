@@ -15,7 +15,8 @@ export default function BaseChest({
   quotes = [],
   showHoverShadow = true,
   customIcon = null,
-  customLabel = null
+  customLabel = null,
+  userName = ''
 }) {
   const [showModal, setShowModal] = useState(false);
 
@@ -73,6 +74,8 @@ export default function BaseChest({
         isOpen={showModal} 
         onClose={handleCloseModal}
         quotes={quotes}
+        type={type}
+        userName={userName}
       />
     </div>
   );

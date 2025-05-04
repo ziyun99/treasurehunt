@@ -79,7 +79,7 @@ export default function LandmarkChest({
                   position={{ left: 0, top: 0 }}
                   size={iconSize}
                   onClick={handleClick}
-                  quotes={[landmarkChestQuotes.getQuote(id)]}
+                  quotes={landmarkChestQuotes.getQuote(id)}
                 />
               </div>
             </foreignObject>
