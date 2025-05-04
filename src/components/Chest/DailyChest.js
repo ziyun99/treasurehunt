@@ -3,6 +3,7 @@ import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
 import BaseChest from './BaseChest';
 import DailyCheckInModal from '../modals/DailyCheckInModal';
+import { dailyChestQuotes } from '../../config/dailyChestQuotes';
 
 export default function DailyChest({ 
   user,
@@ -73,7 +74,7 @@ export default function DailyChest({
         onClick={handleClick}
         showHoverShadow={!isCheckedIn}
         customIcon={isCheckedIn ? '/icons/chest-blue-light.svg' : '/icons/chest-blue.svg'}
-        // customLabel={isCheckedIn ? '每日簽到（已完成）' : '每日簽到'}
+        quotes={[dailyChestQuotes.getTodayQuote()]}
       />
       <DailyCheckInModal
         isOpen={showModal}

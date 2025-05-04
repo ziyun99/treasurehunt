@@ -2,7 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 
-const quotes = [
+const defaultQuotes = [
   {
     text: "每一次的探索都是心靈的冒險，每一次的發現都是智慧的結晶。",
     author: "探索者"
@@ -25,13 +25,14 @@ const quotes = [
   }
 ];
 
-export default function QuoteModal({ isOpen, onClose }) {
+export default function QuoteModal({ isOpen, onClose, quotes = [] }) {
   const [currentQuote, setCurrentQuote] = useState(null);
 
   useEffect(() => {
     if (isOpen) {
-      const randomIndex = Math.floor(Math.random() * quotes.length);
-      setCurrentQuote(quotes[randomIndex]);
+      const availableQuotes = quotes.length > 0 ? quotes : defaultQuotes;
+      const randomIndex = Math.floor(Math.random() * availableQuotes.length);
+      setCurrentQuote(availableQuotes[randomIndex]);
     }
   }, [isOpen]);
 
