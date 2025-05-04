@@ -68,8 +68,8 @@ export default function DiamondChest({
         await updateDoc(userRef, {
           [`progress.diamond.${id}`]: true
         });
-        handleProgressUpdate("diamondChest");
-        console.log("handleProgressUpdate diamondChest");
+        handleProgressUpdate("diamondChest", id + 1);
+        console.log("handleProgressUpdate diamondChest", id + 1);
         setShowDiamondModal(false);
         return true;
       } catch (error) {

@@ -4,7 +4,7 @@ import { db } from "../../firebase";
 import Confetti from "react-confetti";
 import { GAME_RULES } from "../../config/gameRules";
 
-export default function LandmarkModal({ user, activeLandmark, progress, onClose, onProgressUpdate }) {
+export default function LandmarkModal({ user, activeLandmark, progress, onClose, handleProgressUpdate }) {
   const [passwordInput, setPasswordInput] = useState("");
   const [message, setMessage] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
@@ -54,7 +54,7 @@ export default function LandmarkModal({ user, activeLandmark, progress, onClose,
         await updateDoc(userRef, {
           [`progress.landmark.${activeLandmark}`]: true
         });
-        onProgressUpdate("landmarkUnlock");
+        handleProgressUpdate("landmarkUnlock", activeLandmark + 1);
 
         // Check if this is the first unlock
         const firstUnlock = !progress?.[activeLandmark];

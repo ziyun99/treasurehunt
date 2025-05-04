@@ -165,19 +165,28 @@ export default function Home() {
     setShowAchievement(false);
   };
 
-  const handleProgressUpdate = async (taskId) => {
+  const handleProgressUpdate = async (taskName, taskId) => {
     const ref = doc(db, "users", user.uid);
     const snap = await getDoc(ref);
     setProgress(snap.data().progress);
 
     // Update points using the points manager
-    await updateDiamondPoints({
+    const newPoints = await updateDiamondPoints({
       user,
-      taskId: taskId,
+      taskId: taskName,
       currentPoints: diamondPoints,
       setDiamondPoints,
       setShowDiamondBonus,
       setdiamondBonusTask
+    });
+
+    // Add diamond log entry
+    const diamondLogRef = doc(db, "users", user.uid, "diamond_logs", Date.now().toString());
+    await setDoc(diamondLogRef, {
+      timestamp: new Date(),
+      task: GAME_RULES.tasks[taskName].id,
+      task_id: taskId,
+      points: GAME_RULES.tasks[taskName].points
     });
   };
 
@@ -359,7 +368,7 @@ export default function Home() {
         activeLandmark={activeLandmark}
         progress={progress.landmark}
         onClose={handleModalClose}
-        onProgressUpdate={handleProgressUpdate}
+        handleProgressUpdate={handleProgressUpdate}
       />
 
       {showAchievement && (
