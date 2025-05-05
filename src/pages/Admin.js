@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth, db } from '../firebase';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, getDoc, doc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { isAdmin } from '../utils/admin';
 import {
@@ -46,6 +46,7 @@ export default function Admin() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [pageInput, setPageInput] = useState('');
   const [activeTab, setActiveTab] = useState('users');
+  const [admins, setAdmins] = useState([]);
 
   // Get unique values for dropdowns
   const uniqueLocations = [...new Set(users.map(user => user.location).filter(Boolean))].sort();
@@ -83,15 +84,30 @@ export default function Admin() {
           role: '管理員'
         });
 
+        // Fetch users data
         const usersSnapshot = await getDocs(collection(db, 'users'));
         const usersData = usersSnapshot.docs.map(doc => ({
           id: doc.id,
           ...doc.data()
         }));
         setUsers(usersData);
+
+        // Fetch admins data
+        const adminsSnapshot = await getDocs(collection(db, 'admin'));
+        const adminsData = await Promise.all(
+          adminsSnapshot.docs.map(async (adminDoc) => {
+            const userDoc = await getDoc(doc(db, 'users', adminDoc.id));
+            return {
+              id: adminDoc.id,
+              ...userDoc.data(),
+              role: '管理員'
+            };
+          })
+        );
+        setAdmins(adminsData);
       } catch (error) {
         console.error('Error:', error);
-        setError('Failed to load user data');
+        setError('Failed to load data');
       } finally {
         setLoading(false);
       }
@@ -481,7 +497,7 @@ export default function Admin() {
             >
               返回首頁
             </button>
-            <h1 className="text-2xl font-bold text-gray-800">管理員面板</h1>
+            <h1 className="text-2xl font-bold text-gray-800">管理員頁面</h1>
           </div>
           <div className="text-center text-gray-600">載入中...</div>
         </div>
@@ -500,7 +516,7 @@ export default function Admin() {
             >
               返回首頁
             </button>
-            <h1 className="text-2xl font-bold text-gray-800">管理員面板</h1>
+            <h1 className="text-2xl font-bold text-gray-800">管理員頁面</h1>
           </div>
           <div className="text-center text-red-600">{error}</div>
         </div>
@@ -519,7 +535,7 @@ export default function Admin() {
           >
             返回首頁
           </button>
-          <h1 className="text-2xl font-bold text-gray-800 text-center sm:text-left">管理員面板</h1>
+          <h1 className="text-2xl font-bold text-gray-800 text-center sm:text-left">管理員頁面</h1>
         </div>
 
         {/* Admin Info Section */}
@@ -569,6 +585,16 @@ export default function Admin() {
                 } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
               >
                 數據分析
+              </button>
+              <button
+                onClick={() => setActiveTab('admins')}
+                className={`${
+                  activeTab === 'admins'
+                    ? 'border-indigo-500 text-indigo-600'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+              >
+                管理員列表
               </button>
             </nav>
           </div>
@@ -803,7 +829,7 @@ export default function Admin() {
               )}
             </div>
           </>
-        ) : (
+        ) : activeTab === 'analytics' ? (
           <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gray-100">
             {/* Key Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -1059,6 +1085,71 @@ export default function Admin() {
                   />
                 </div>
               </div>
+            </div>
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl shadow-sm p-4 sm:p-6 border border-gray-100">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      #
+                    </th>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      姓名
+                    </th>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Email
+                    </th>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      UID
+                    </th>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      手機號碼
+                    </th>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      地區
+                    </th>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      角色
+                    </th>
+                    <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      最後更新
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {admins.map((admin, index) => (
+                    <tr key={admin.id} className="hover:bg-gray-50 transition-colors">
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {index + 1}
+                      </td>
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {admin.name || '-'}
+                      </td>
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 break-all">
+                        {admin.email || '-'}
+                      </td>
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900 break-all">
+                        {admin.id}
+                      </td>
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {admin.countryCode && admin.phoneNumber ? `${admin.countryCode} ${admin.phoneNumber}` : '-'}
+                      </td>
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {admin.location || '-'}
+                      </td>
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-indigo-600 font-medium">
+                        {admin.role}
+                      </td>
+                      <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {formatDate(admin.lastDiamondUpdated)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}

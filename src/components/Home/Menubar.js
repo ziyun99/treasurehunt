@@ -61,7 +61,7 @@ export default function Menubar({ user, isVertical = false }) {
       className: 'hover:bg-indigo-100/50'
     },
     ...(isAdminUser ? [{
-      label: '管理員面板',
+      label: '管理員頁面',
       icon: '⚙️',
       onClick: () => navigate('/admin'),
       className: 'hover:bg-indigo-100/50'
