@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { createPortal } from 'react-dom';
-import { collection, query, orderBy, limit, getDocs } from 'firebase/firestore';
-import { db } from '../../firebase';
 import { auth } from '../../firebase';
+import { getLeaderboardData } from '../../utils/leaderboard';
 
 export default function LeaderboardModal({ isOpen, onClose }) {
   const [users, setUsers] = useState([]);
@@ -18,44 +17,8 @@ export default function LeaderboardModal({ isOpen, onClose }) {
       const currentUser = auth.currentUser;
       if (!currentUser) return;
 
-      // First, get all users to find current user's rank
-      const allUsersRef = collection(db, "users");
-      const allUsersQuery = query(
-        allUsersRef, 
-        orderBy("diamondPoints", "desc")
-      );
-      const allUsersSnapshot = await getDocs(allUsersQuery);
-      
-      // Process users and handle missing lastDiamondUpdated
-      const allUsers = allUsersSnapshot.docs.map((doc, index) => {
-        const data = doc.data();
-        // If lastDiamondUpdated doesn't exist, use a very large timestamp (year 3000)
-        if (!data.lastDiamondUpdated) {
-          data.lastDiamondUpdated = { 
-            seconds: 32503680000, // January 1, 3000
-            nanoseconds: 0 
-          };
-        }
-        return {
-          id: doc.id,
-          rank: index + 1,
-          ...data
-        };
-      });
-
-      // Sort users by diamondPoints and lastDiamondUpdated in memory
-      allUsers.sort((a, b) => {
-        if (a.diamondPoints !== b.diamondPoints) {
-          return b.diamondPoints - a.diamondPoints;
-        }
-        // For users with same points, earlier timestamp gets higher rank
-        return a.lastDiamondUpdated.seconds - b.lastDiamondUpdated.seconds;
-      });
-
-      // Update ranks after sorting
-      allUsers.forEach((user, index) => {
-        user.rank = index + 1;
-      });
+      // Get leaderboard data
+      const allUsers = await getLeaderboardData();
 
       // Find current user's data
       const userData = allUsers.find(user => user.id === currentUser.uid);

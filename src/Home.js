@@ -178,25 +178,13 @@ export default function Home() {
     // Update points using the points manager
     const newPoints = await updateDiamondPoints({
       user,
-      taskId: taskName,
+      taskName: taskName,
+      taskId: taskId,
       currentPoints: diamondPoints,
       setDiamondPoints,
       setShowDiamondBonus,
       setdiamondBonusTask
     });
-
-    // Add diamond log entry
-    const diamondLogRef = doc(db, "users", user.uid, "diamond_logs", Date.now().toString());
-    const logData = {
-      timestamp: new Date(),
-      task: GAME_RULES.tasks[taskName].id,
-      points: GAME_RULES.tasks[taskName].points
-    };
-    // Only add task_id if it's provided
-    if (taskId) {
-      logData.task_id = taskId;
-    }
-    await setDoc(diamondLogRef, logData);
   };
 
   const handleModalClose = () => {
